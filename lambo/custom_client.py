@@ -19,8 +19,6 @@ class CustomClient(Bot):
                 if intent not in valid_intents:
                     raise ValueError(f'Invalid intent: {intent}')
                 setattr(intents, intent, True)
-
-        print(f'Intents: {intents}')
         super().__init__(command_prefix=prefix, intents=intents, **kwargs)
         self.settings = settings
 
