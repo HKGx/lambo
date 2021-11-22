@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseSettings
 
 
@@ -6,6 +7,7 @@ class Settings(BaseSettings):
     db_url: str
     extensions: list[str] = []
     token: str
+    intents: Optional[list[str]] = None
 
     class Config:
         env_file = ".env"
