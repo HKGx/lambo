@@ -29,4 +29,4 @@ class CustomClient(Bot):
         return super().run(self.settings.token)
 
     async def on_ready(self):
-        print(f'Logged in as {self.user}')
+        print(f'Logged in as {self.user}', flush=True)
