@@ -17,11 +17,11 @@ def get_guild_emojis_from_str(string: str, guild: discord.Guild) -> set[str]:
     return emojis
 
 
-def parse_message(message: discord.Message) -> tuple[Iterator[UsedEmojiModel], int]:
+def parse_message(message: discord.Message) -> set[UsedEmojiModel]:
     emojis = get_guild_emojis_from_str(
         message.content, message.guild)  # type: ignore
-    return map(lambda emoji: UsedEmojiModel(
-        emoji=emoji, used_by=message.author.id, timestamp=message.created_at), emojis), len(emojis)  # type: ignore
+    author_id: int = message.author.id  # type: ignore
+    return {UsedEmojiModel(emoji=emoji, used_by=str(author_id), timestamp=message.created_at) for emoji in emojis}
 
 
 class CountEmojiCog(Cog):
@@ -40,8 +40,7 @@ class CountEmojiCog(Cog):
         if message.content.startswith(self.bot.command_prefix):  # type: ignore
             return
         parse = parse_message(message)
-        if parse[1] > 0:
-            await UsedEmojiModel.bulk_create(parse[0])
+        await UsedEmojiModel.bulk_create(parse)
 
     @ command(name="emojis")
     async def emojis(self, ctx: Context, emoji: discord.Emoji, from_date: DateConverter = None, to_date: DateConverter = None):
@@ -66,6 +65,7 @@ class CountEmojiCog(Cog):
         limit = min(limit, 10000)
         await ctx.send("Loading history...")
         i = 0
+        last = before
         async with ctx.typing():
             channel: discord.TextChannel = ctx.channel   # type: ignore
             async for message in channel.history(limit=limit, before=before):
@@ -74,12 +74,14 @@ class CountEmojiCog(Cog):
                 if message.content.startswith(self.bot.command_prefix):
                     continue
                 parse = parse_message(message)
-                if parse[1] > 0:
-                    await UsedEmojiModel.bulk_create(parse[0])
-                    i += 1
-                    if i % 10 == 0:
-                        print(f"{i} messages processed.")
-        await ctx.send("Done.")
+                last = message
+                await UsedEmojiModel.bulk_create(parse)
+                i += 1
+                if i % 10 == 0:
+                    print(f"{i} messages processed.")
+
+        print(f"{i} messages processed.", flush=True)
+        await ctx.send(f"Done. Last message: {last.jump_url}")
 
 
 def setup(bot: CustomClient):
