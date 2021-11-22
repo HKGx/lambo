@@ -17,11 +17,11 @@ def get_guild_emojis_from_str(string: str, guild: discord.Guild) -> set[str]:
     return emojis
 
 
-def parse_message(message: discord.Message) -> set[UsedEmojiModel]:
+def parse_message(message: discord.Message) -> list[UsedEmojiModel]:
     emojis = get_guild_emojis_from_str(
         message.content, message.guild)  # type: ignore
     author_id: int = message.author.id  # type: ignore
-    return {UsedEmojiModel(emoji=emoji, used_by=str(author_id), timestamp=message.created_at) for emoji in emojis}
+    return [UsedEmojiModel(emoji=emoji, used_by=str(author_id), timestamp=message.created_at) for emoji in emojis]
 
 
 class CountEmojiCog(Cog):
