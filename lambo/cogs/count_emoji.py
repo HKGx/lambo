@@ -51,10 +51,12 @@ class CountEmojiCog(Cog):
         from_: datetime = datetime.combine(
             from_date, datetime.min.time()) if from_date is not None else datetime.min  # type: ignore
         to_: datetime = datetime.combine(
-            to_date, datetime.max.time()) if to_date is not None else datetime.max  # type: ignore
+            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
         emojis_count = await UsedEmojiModel.filter(
             emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
-        await ctx.send(f"{emoji} was used {emojis_count} times")
+        from_str = from_.strftime("%d.%m.%Y")
+        to_str = to_.strftime("%d.%m.%Y")
+        await ctx.send(f"{emoji} was used {emojis_count} times from {from_str} to {to_str}.")
 
     @is_owner()
     @ command(name="load-history")
