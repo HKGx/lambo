@@ -61,7 +61,7 @@ class CountEmojiCog(Cog):
     async def load_history(self, ctx: Context, limit: int, before: discord.Message = None):
         if before is None:
             before = ctx.message  # type: ignore
-        limit = min(limit, 1000)
+        limit = min(limit, 10000)
         await ctx.send("Loading history...")
         i = 0
         async with ctx.typing():
