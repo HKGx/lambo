@@ -1,12 +1,14 @@
-from datetime import date, datetime
-from discord.ext.commands import Cog, command, Context, is_owner
-import discord
+from datetime import datetime, time
 
+import discord
+from discord.utils import DISCORD_EPOCH
+from discord.ext.commands import Cog, Context, command, is_owner
 from lambo.custom_client import CustomClient
 from lambo.models.used_emoji_model import UsedEmojiModel
 from lambo.utils import DateConverter
+from tortoise.functions import Count
 
-from typing import AsyncIterable, Iterator
+_EPOCH = datetime.utcfromtimestamp(DISCORD_EPOCH / 1000)
 
 
 def get_guild_emojis_from_str(string: str, guild: discord.Guild) -> set[str]:
@@ -24,6 +26,13 @@ def parse_message(message: discord.Message) -> list[UsedEmojiModel]:
     return [UsedEmojiModel(emoji=emoji, used_by=str(author_id), timestamp=message.created_at) for emoji in emojis]
 
 
+def get_timestamp_tag(timestamp: datetime) -> str:
+    if timestamp < _EPOCH:
+        timesetamp = _EPOCH
+    from_unix = int(datetime.timestamp(timestamp))
+    return f"<t:{from_unix}>"
+
+
 class CountEmojiCog(Cog):
     bot: CustomClient
 
@@ -31,7 +40,7 @@ class CountEmojiCog(Cog):
         self.bot = bot
         print("Loaded count emoji cog.")
 
-    @ Cog.listener()
+    @Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:  # type: ignore
             return
@@ -42,22 +51,47 @@ class CountEmojiCog(Cog):
         parse = parse_message(message)
         await UsedEmojiModel.bulk_create(parse)
 
-    @ command(name="emojis")
+    @command(name="emojis")
     async def emojis(self, ctx: Context, emoji: discord.Emoji, from_date: DateConverter = None, to_date: DateConverter = None):
         if emoji.guild is None:
             await ctx.send("This emoji is not in a guild.")
             return
         from_: datetime = datetime.combine(
-            from_date, datetime.min.time()) if from_date is not None else datetime.min  # type: ignore
+            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
         to_: datetime = datetime.combine(
             to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
         emojis_count = await UsedEmojiModel.filter(
             emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
-        from_str = from_.strftime("%d.%m.%Y")
-        to_str = to_.strftime("%d.%m.%Y")
+        from_str = get_timestamp_tag(from_)
+        to_str = get_timestamp_tag(to_)
         await ctx.send(f"{emoji} was used {emojis_count} times from {from_str} to {to_str}.")
 
-    @is_owner()
+    @command(name="emojis-rank")
+    async def emojis_rank(self, ctx: Context, from_date: DateConverter = None, to_date: DateConverter = None):
+        from_: datetime = datetime.combine(
+            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
+        to_: datetime = datetime.combine(
+            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
+
+        values: list[dict[str, int | str]] = (await UsedEmojiModel.annotate(count=Count("id"))      # type: ignore
+                                              .filter(timestamp__gte=from_, timestamp__lte=to_)
+                                              .limit(10)
+                                              .group_by("emoji")
+                                              .order_by("-count")
+                                              .values("emoji", "count"))
+
+        from_str = get_timestamp_tag(from_)
+        to_str = get_timestamp_tag(to_)
+        sb = f"Ranking from {from_str} to {to_str}\n"
+        guild: discord.Guild = ctx.guild  # type: ignore
+        for g in values:
+            guild_emojis: list[discord.Emoji] = guild.emojis  # type: ignore
+            emoji: discord.Emoji = [
+                e for e in guild_emojis if e.name == g["emoji"]][0]  # type: ignore
+            sb += f"{emoji} was used {g['count']} times.\n"
+        await ctx.send(sb)
+
+    @ is_owner()
     @ command(name="load-history")
     async def load_history(self, ctx: Context, limit: int, before: discord.Message = None):
         if before is None:
