@@ -66,7 +66,36 @@ class CountEmojiCog(Cog):
         to_str = get_timestamp_tag(to_)
         await ctx.send(f"{emoji} was used {emojis_count} times from {from_str} to {to_str}.")
 
-    @command(name="emojis-rank")
+    @command(name="emojis-users")
+    async def emojis_users(self, ctx: Context, emoji: discord.Emoji, from_date: DateConverter = None, to_date: DateConverter = None):
+        if emoji.guild is None:
+            await ctx.send("This emoji is not in a guild.")
+            return
+        from_: datetime = datetime.combine(
+            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
+        to_: datetime = datetime.combine(
+            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
+        # Get all users who used the emoji and their count
+        users: list[dict[str, int]] = (await UsedEmojiModel
+                                       .annotate(count=Count("used_by"))
+                                       .group_by("used_by")
+                                       .order_by("-count")
+                                       .filter(
+                                           emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).limit(10).values(
+                                           "used_by", "count"))  # type: ignore
+        # All usages during the time period
+        emojis_count = await UsedEmojiModel.filter(
+            emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
+        from_str = get_timestamp_tag(from_)
+        to_str = get_timestamp_tag(to_)
+
+        sb = f"{emoji} user usages from {from_str} to {to_str}."
+        for user in users:
+            percentage = round(user["count"] / emojis_count * 100, 2)
+            sb += f"\n<@{user['used_by']}> used {user['count']} times ({percentage}%)."
+        await ctx.send(sb, allowed_mentions=discord.AllowedMentions(users=False))
+
+    @ command(name="emojis-rank")
     async def emojis_rank(self, ctx: Context, from_date: DateConverter = None, to_date: DateConverter = None):
         from_: datetime = datetime.combine(
             from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
