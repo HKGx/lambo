@@ -17,6 +17,7 @@ async def run():
 
     for extension in config.extensions:
         bot.load_extension(extension)
+        print(f'Loaded extension `{extension}`')
 
     await bot.start()
 
