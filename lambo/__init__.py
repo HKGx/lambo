@@ -4,7 +4,7 @@ import asyncio
 from tortoise import Tortoise, run_async
 from lambo.config import Settings
 from lambo.custom_client import CustomClient
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, errors
 
 config = Settings()
 bot = CustomClient(config)
@@ -26,7 +26,8 @@ def main():
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(run())
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, errors.ExtensionFailed) as e:
+        print(f'{e}')
         loop.run_until_complete(Tortoise.close_connections())
         loop.run_until_complete(bot.close())
     finally:
