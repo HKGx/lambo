@@ -1,5 +1,5 @@
 import discord
-from discord.ext.commands import Cog, Context, command, group
+from discord.ext.commands import Cog, Context, command, group, has_permissions
 from lambo.custom_client import CustomClient
 
 
@@ -10,6 +10,7 @@ class ModerationUtilsCog(Cog):
         self.bot = bot
 
     @group(name="role", invoke_without_command=False)
+    @has_permissions(manage_roles=True)
     async def role(self, ctx: Context):
         pass
 
