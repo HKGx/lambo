@@ -1,10 +1,13 @@
 __version__ = '0.1.0'
+
+
 import asyncio
 
-from tortoise import Tortoise, run_async
+from discord.ext.commands import errors
+from tortoise import Tortoise
+
 from lambo.config import Settings
 from lambo.custom_client import CustomClient
-from discord.ext.commands import Bot, errors
 
 config = Settings()
 bot = CustomClient(config)

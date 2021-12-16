@@ -1,9 +1,9 @@
 import discord
-from discord.ext.commands import Cog, Context, command, group, has_permissions
+from discord.ext.commands import Cog, Context, group, has_permissions
 from lambo.custom_client import CustomClient
 
 
-class ModerationUtilsCog(Cog):
+class ModerationUtilsCog(Cog, name="Moderation Utilities"):
     bot: CustomClient
 
     def __init__(self, bot: CustomClient):

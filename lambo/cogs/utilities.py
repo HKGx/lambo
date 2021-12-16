@@ -1,11 +1,10 @@
-from glob import escape
 import discord
-from discord.ext.commands import Cog, Context, command, group, has_permissions
-from lambo.custom_client import CustomClient
+from discord.ext.commands import Cog, Context, command
 from discord.utils import escape_markdown
+from lambo.custom_client import CustomClient
 
 
-class UtilitiesCog(Cog):
+class UtilitiesCog(Cog, name="Utilities"):
     bot: CustomClient
 
     def __init__(self, bot: CustomClient) -> None:

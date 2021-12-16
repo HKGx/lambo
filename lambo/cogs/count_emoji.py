@@ -1,8 +1,8 @@
-from datetime import datetime, time
+from datetime import datetime
 
 import discord
+from discord.ext.commands import Cog, Context, group, is_owner
 from discord.utils import DISCORD_EPOCH
-from discord.ext.commands import Cog, Context, command, is_owner, group
 from lambo.custom_client import CustomClient
 from lambo.models.used_emoji_model import UsedEmojiModel
 from lambo.utils import DateConverter
@@ -33,7 +33,7 @@ def get_timestamp_tag(timestamp: datetime) -> str:
     return f"<t:{from_unix}>"
 
 
-class CountEmojiCog(Cog):
+class CountEmojiCog(Cog, name="Emoji Counting"):
     bot: CustomClient
 
     def __init__(self, bot: CustomClient):
