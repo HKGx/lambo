@@ -1,6 +1,25 @@
 from datetime import date, datetime
+from discord import Guild, Role
 
-from discord.ext.commands import Context, Converter
+
+from discord.ext.commands import Context, Converter, RoleConverter, RoleNotFound
+
+
+class FuzzyRoleConverter(RoleConverter):
+    async def convert(self, ctx: Context, argument: str) -> Role:
+        try:
+            role = await super().convert(ctx, argument)
+            return role
+        except RoleNotFound as e:
+            guild: Guild = ctx.guild  # type: ignore
+            if guild == None:
+                raise e
+            matching_roles = [role
+                              for role in guild._roles.values()
+                              if argument.lower() in role.name.lower()]
+            if len(matching_roles) == 0:
+                raise e
+            return matching_roles[0]
 
 
 class DateConverter(Converter):
