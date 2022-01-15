@@ -41,11 +41,12 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.author.bot:  # type: ignore
+        if message.author.bot:
             return
-        if message.guild is None:  # type: ignore
+        if message.guild is None:
             return
-        if message.content.startswith(self.bot.command_prefix):  # type: ignore
+        prefixes = await self.bot.get_prefix(message)
+        if any(message.content.startswith(prefix) for prefix in prefixes):
             return
         parse = parse_message(message)
         await UsedEmojiModel.bulk_create(parse)
@@ -79,13 +80,18 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         to_: datetime = datetime.combine(
             to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
         # Get all users who used the emoji and their count
-        users: list[dict[str, int]] = (await UsedEmojiModel
-                                       .annotate(count=Count("used_by"))
-                                       .group_by("used_by")
-                                       .order_by("-count")
-                                       .filter(
-                                           emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).limit(10).values(
-                                           "used_by", "count"))  # type: ignore
+        users: list[dict[str, int]] = (
+            await UsedEmojiModel
+            .annotate(count=Count("used_by"))
+            .group_by("used_by")
+            .order_by("-count")
+            .filter(
+                emoji=emoji.name,
+                timestamp__gte=from_,
+                timestamp__lte=to_
+            ).limit(10)
+            .values("used_by", "count")  # type: ignore
+        )
         # All usages during the time period
         emojis_count = await UsedEmojiModel.filter(
             emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
@@ -114,14 +120,14 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
 
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
-        sb = f"Ranking from {from_str} to {to_str}\n"
-        guild: discord.Guild = ctx.guild  # type: ignore
+        content = f"Ranking from {from_str} to {to_str}\n"
+        assert ctx.guild is discord.Guild
         for g in values:
-            guild_emojis: list[discord.Emoji] = guild.emojis  # type: ignore
+            guild_emojis: tuple[discord.Emoji, ...] = ctx.guild.emojis
             emoji: discord.Emoji = [
                 e for e in guild_emojis if e.name == g["emoji"]][0]  # type: ignore
-            sb += f"{emoji} was used {g['count']} times.\n"
-        await ctx.send(sb)
+            content += f"{emoji} was used {g['count']} times.\n"
+        await ctx.send(content)
 
     @is_owner()
     @emojis.command(name="load-history", hidden=True)
