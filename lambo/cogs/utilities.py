@@ -1,4 +1,5 @@
 from textwrap import dedent
+from tokenize import triple_quoted
 
 import discord
 from discord.ext.commands import Cog, Context, command
@@ -38,17 +39,24 @@ class UtilitiesCog(Cog, name="Utilities"):
                    for i in range(0, len(members), per_page)]
         # Prepend every list with the custom message
         id_str = f" ({role.id})" if with_ids else ""
-        prefix = dedent(
-            f"""> Members in role `{role.name}`{id_str}.
-                > Total members: {len(role.members)}"""
-        )
-        members = [dedent(f"""{prefix}
-        ```
-        {member}
-        ```""") for member in members]
+
+        prefix = quoted(
+            f"Members in role `{role.name}`{id_str}.\n"
+            f"Total members: {len(role.members)}.\n")
+
+        members = [f"{prefix}\n{codized(member)}"
+                   for member in members]
         paginator = Paginator(pages=members)
 
         await paginator.send(ctx)
+
+
+def quoted(text: str) -> str:
+    return "\n".join(f"> {line}" for line in text.splitlines())
+
+
+def codized(text: str) -> str:
+    return f"```\n{text}\n```"
 
 
 def setup(bot: CustomClient):
