@@ -1,3 +1,4 @@
+import math
 from textwrap import dedent
 from tokenize import triple_quoted
 
@@ -38,8 +39,9 @@ class UtilitiesCog(Cog, name="Utilities"):
             return
         role: discord.Role = _role  # type: ignore
         members = []
-        for idx, member in enumerate(role.members):
-            ordering = f"{(idx + 1):02}. "
+        pad_with = math.floor(math.log10(min(len(role.members), 1000))) + 1
+        for idx, member in enumerate(role.members[:1000]):
+            ordering = f"{(idx + 1):0{pad_with}}. "
             id_str = f"{member.id} " if flags.with_ids else ""
             members.append(f"{ordering}{id_str}{member}")
         # Join every per_page members in one list
@@ -48,10 +50,15 @@ class UtilitiesCog(Cog, name="Utilities"):
         # Prepend every list with the custom message
         id_str = f" ({role.id})" if flags.with_ids else ""
 
-        prefix = quoted(
+        prefix = (
             f"Members in role `{role.name}`{id_str}.\n"
-            f"Total members: {len(role.members)}.\n")
+            f"Total members: {len(role.members)}.\n"
+        )
+        length_disclaimer = f"Showing only first 1000 members.\n" if len(
+            role.members) > 1000 else ""
 
+        prefix += length_disclaimer
+        prefix = quoted(prefix)
         members_pages = [f"{prefix}\n{codized(page)}"
                          for page in members_pages]
         if flags.page not in range(1, len(members_pages) + 1):
