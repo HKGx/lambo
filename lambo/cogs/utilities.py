@@ -34,7 +34,7 @@ class UtilitiesCog(Cog, name="Utilities"):
 
     @command("inrole")
     async def inrole(self, ctx: Context, _role: FuzzyRoleConverter, *, flags: InroleFlags) -> None:
-        if flags.per_page not in range(1, 30):
+        if 1 <= flags.per_page <= 30:
             await ctx.reply("Please enter a number between 1 and 30.")
             return
         role: discord.Role = _role  # type: ignore
