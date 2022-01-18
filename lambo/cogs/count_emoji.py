@@ -111,7 +111,7 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         to_: datetime = datetime.combine(
             to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
 
-        values: list[dict[str, int | str]] = (await UsedEmojiModel.annotate(count=Count("id"))      # type: ignore
+        values: list[dict[str, int | str]] = (await UsedEmojiModel.annotate(count=Count("id"))  # type: ignore
                                               .filter(timestamp__gte=from_, timestamp__lte=to_)
                                               .limit(10)
                                               .group_by("emoji")
@@ -121,11 +121,16 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
         content = f"Ranking from {from_str} to {to_str}\n"
-        assert isinstance(ctx.guild, discord.Guild)
+        guild: discord.Guild = ctx.guild  # type: ignore
+        assert isinstance(guild, discord.Guild)
         for g in values:
-            guild_emojis: tuple[discord.Emoji, ...] = ctx.guild.emojis
-            emoji: discord.Emoji = [
-                e for e in guild_emojis if e.name == g["emoji"]][0]  # type: ignore
+            guild_emojis: tuple[discord.Emoji, ...] = guild.emojis
+            emojis: list[discord.Emoji] = [
+                e for e in guild_emojis if e.name == g["emoji"]
+            ]
+            if len(emojis) == 0:
+                continue
+            emoji: discord.Emoji = emojis[0]
             content += f"{emoji} was used {g['count']} times.\n"
         await ctx.send(content)
 
