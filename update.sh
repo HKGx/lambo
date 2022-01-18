@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -xe
+
 git pull
-sudo docker-compose build lambo
-sudo docker-compose up -d
+docker-compose build lambo
+docker-compose up -d
