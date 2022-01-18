@@ -121,7 +121,7 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
         content = f"Ranking from {from_str} to {to_str}\n"
-        assert ctx.guild is discord.Guild
+        assert isinstance(ctx.guild, discord.Guild)
         for g in values:
             guild_emojis: tuple[discord.Emoji, ...] = ctx.guild.emojis
             emoji: discord.Emoji = [
