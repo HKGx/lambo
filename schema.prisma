@@ -4,8 +4,10 @@ datasource db {
 }
 
 generator client {
-    provider  = "prisma-client-py"
-    interface = "asyncio"
+    provider      = "prisma-client-py"
+    interface     = "asyncio"
+    // by default I deploy to ARM64 based server
+    binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
 }
 
 model EmojiSent {
