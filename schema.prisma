@@ -1,0 +1,63 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("db_url")
+}
+
+generator client {
+    provider  = "prisma-client-py"
+    interface = "asyncio"
+}
+
+model EmojiSent {
+    id         Int      @id @default(autoincrement())
+    emoji_id   String   @db.VarChar(20)
+    user_id    String   @db.VarChar(20)
+    guild_id   String   @db.VarChar(20)
+    channel_id String   @db.VarChar(20)
+    sent_at    DateTime @default(now())
+
+    @@index([emoji_id, sent_at, user_id, guild_id, channel_id])
+}
+
+// model GameUser {
+//     id            String          @id @db.VarChar(20)
+//     guild_id      String          @db.VarChar(20)
+//     InventoryItem InventoryItem[]
+// }
+
+// model GameItem {
+//     id          Int     @id @default(autoincrement())
+//     name        String
+//     description String?
+//     guild_id    String  @db.VarChar(20)
+
+//     ShopItem      ShopItem[]      @relation("item")
+//     BuyShopItem   ShopItem[]      @relation("buy_currency")
+//     SellShopItem  ShopItem[]      @relation("sell_currency")
+//     InventoryItem InventoryItem[]
+//     @@index([id, guild_id, name])
+// }
+
+// model ShopItem {
+//     id                   Int       @id @default(autoincrement())
+//     game_item            GameItem  @relation(name: "item", fields: [gameItemId], references: [id], onDelete: Cascade)
+//     buy_currency         GameItem  @relation(name: "buy_currency", fields: [buyCurrencyId], references: [id], onDelete: Cascade)
+//     buy_currency_amount  Int
+//     sell_currency        GameItem? @relation(name: "sell_currency", fields: [sellCurrencyId], references: [id], onDelete: Cascade)
+//     sell_currency_amount Int       @default(0)
+//     purchasable          Boolean   @default(false)
+
+//     gameItemId     Int
+//     buyCurrencyId  Int
+//     sellCurrencyId Int
+//     @@index([gameItemId, purchasable, buyCurrencyId, sellCurrencyId])
+// }
+
+// model InventoryItem {
+//     id         Int      @id @default(autoincrement())
+//     item       GameItem @relation(fields: [gameItemId], references: [id], onDelete: Cascade)
+//     user       GameUser @relation(fields: [gameUserId], references: [id], onDelete: Cascade)
+//     quantity   Int      @default(0)
+//     gameItemId Int
+//     gameUserId String   @db.VarChar(20)
+// }

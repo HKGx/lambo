@@ -19,12 +19,16 @@ class CustomClient(Bot):
             valid_intents: dict[str, int] = discord.Intents.VALID_FLAGS  # type: ignore # noqa
             for intent in raw_intents:
                 if intent not in valid_intents:
-                    raise ValueError(f'Invalid intent: {intent}')
+                    raise ValueError(f"Invalid intent: {intent}")
                 setattr(intents, intent, True)
         allowed_mentions = discord.AllowedMentions.none()
         allowed_mentions.replied_user = True
-        super().__init__(command_prefix=when_mentioned_or(prefix),
-                         intents=intents, allowed_mentions=allowed_mentions, **kwargs)
+        super().__init__(
+            command_prefix=when_mentioned_or(prefix),
+            intents=intents,
+            allowed_mentions=allowed_mentions,
+            **kwargs,
+        )
         self.settings = settings
 
     async def start(self):
@@ -36,5 +40,4 @@ class CustomClient(Bot):
         return super().run(self.settings.token)
 
     async def on_ready(self):
-        print(
-            f'Logged in as {self.user} with intents {self.intents}', flush=True)
+        print(f"Logged in as {self.user} with intents {self.intents}", flush=True)
