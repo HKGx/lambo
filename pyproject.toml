@@ -9,13 +9,14 @@ lambo = 'lambo:main'
 
 [tool.poetry.dependencies]
 python = "^3.10"
-py-cord = {git = "https://github.com/Pycord-Development/pycord.git"}
-pydantic = {extras = ["dotenv"], version = "^1.8.2"}
-tortoise-orm = {extras = ["aiosqlite"], version = "^0.17.8"}
+py-cord = { git = "https://github.com/Pycord-Development/pycord.git" }
+pydantic = { extras = ["dotenv"], version = "^1.8.2" }
+prisma = "^0.4.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 autopep8 = "^1.6.0"
+black = "^21.12b0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

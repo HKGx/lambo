@@ -5,13 +5,13 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     prefix: str = "b!"
-    db_url: str = "sqlite://:memory:"
+    db_url: str
     extensions: list[str] = [
-        "lambo.cogs.count_emoji", "lambo.cogs.moderation_utils", "lambo.cogs.utilities"
+        "lambo.cogs.count_emoji",
+        "lambo.cogs.moderation_utils",
+        "lambo.cogs.utilities",
     ]
-    models: list[str] = [
-        'lambo.models.used_emoji_model'
-    ]
+    models: list[str] = ["lambo.models.used_emoji_model"]
     non_default_extensions: list[str] = []
     token: Optional[str] = None
     intents: Optional[list[str]] = None
