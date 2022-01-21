@@ -2,7 +2,7 @@ __version__ = "0.1.0"
 
 
 import asyncio
-from discord import ExtensionFailed
+from discord import ExtensionFailed, ExtensionNotFound
 
 from discord.ext.commands import errors
 from prisma import Client
@@ -11,7 +11,8 @@ import prisma
 from lambo.config import Settings
 from lambo.custom_client import CustomClient
 
-config = Settings()
+# Ignore type, 
+config: Settings = Settings()  # type: ignore
 prisma_client = Client(auto_register=True)
 bot = CustomClient(config)
 
@@ -20,8 +21,11 @@ async def run():
     await prisma_client.connect()
     extensions = [*config.extensions, *config.non_default_extensions]
     for extension in extensions:
-        bot.load_extension(extension)
-        print(f"Loaded extension `{extension}`")
+        try:
+            bot.load_extension(extension)
+            print(f"Loaded extension `{extension}`")
+        except ExtensionNotFound:
+            print(f"Extension {extension} not found")
 
     await bot.start()
 
