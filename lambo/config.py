@@ -1,18 +1,22 @@
 from typing import Optional
 
-from pydantic import BaseSettings
+
+from pydantic import BaseSettings, Field
 
 
-class Settings(BaseSettings):
-    prefix: str = "b!"
-    db_url: str
-    extensions: list[str] = [
+def default_extensions():
+    return [
         "lambo.cogs.count_emoji",
         "lambo.cogs.moderation_utils",
         "lambo.cogs.utilities",
     ]
-    models: list[str] = ["lambo.models.used_emoji_model"]
-    non_default_extensions: list[str] = []
+
+
+class Settings(BaseSettings):
+    db_url: str
+    prefix: str = "b!"
+    extensions: list[str] = Field(default_factory=default_extensions)
+    non_default_extensions: list[str] = Field(default_factory=list)
     token: Optional[str] = None
     intents: Optional[list[str]] = None
 
