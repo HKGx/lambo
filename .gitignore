@@ -2,3 +2,5 @@
 __pycache__/
 .vscode
 db.sqlite3*
+lambo/cogs/wip*/
+
