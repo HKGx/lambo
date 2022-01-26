@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   lambo:
-    image: lambo
+    image: lambo:old
     build:
       context: .
       dockerfile: ./Dockerfile
