@@ -11,7 +11,7 @@ lambo = 'lambo:main'
 python = "^3.10"
 py-cord = {git = "https://github.com/Pycord-Development/pycord.git"}
 pydantic = {extras = ["dotenv"], version = "^1.8.2"}
-tortoise-orm = {extras = ["aiosqlite"], version = "^0.17.8"}
+tortoise-orm = {extras = ["aiosqlite"], version = "^0.18.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
