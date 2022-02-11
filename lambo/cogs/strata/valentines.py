@@ -1,10 +1,8 @@
 import asyncio
-from tkinter.font import ITALIC
 from turtle import title
+
 import discord
-from discord.ext.commands import Cog, Context, command, cooldown, BucketType
-from discord.utils import escape_markdown
-from more_itertools import bucket
+from discord.ext.commands import BucketType, Cog, Context, command, cooldown
 from lambo import CustomClient
 
 
