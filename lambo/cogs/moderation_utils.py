@@ -2,7 +2,7 @@ import typing
 
 import discord
 from discord.ext.commands import Cog, Context, FlagConverter, group, has_permissions
-from lambo.custom_client import CustomClient
+from lambo import CustomClient
 from lambo.utils import FuzzyRoleConverter
 
 

@@ -6,7 +6,7 @@ import discord
 from discord.ext.commands import Cog, Context, command, FlagConverter, flag
 from discord.ext.pages import PageGroup, Paginator
 from discord.utils import escape_markdown
-from lambo.custom_client import CustomClient
+from lambo import CustomClient
 from lambo.utils import FuzzyRoleConverter
 
 

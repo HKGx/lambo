@@ -3,7 +3,7 @@ from datetime import datetime
 import discord
 from discord.ext.commands import Cog, Context, group, is_owner
 from discord.utils import DISCORD_EPOCH
-from lambo.custom_client import CustomClient
+from lambo import CustomClient
 from lambo.models.used_emoji_model import UsedEmojiModel
 from lambo.utils import DateConverter
 from tortoise.functions import Count
