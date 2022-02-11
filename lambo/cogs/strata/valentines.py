@@ -1,5 +1,4 @@
 import asyncio
-from turtle import title
 
 import discord
 from discord.ext.commands import BucketType, Cog, Context, command, cooldown
