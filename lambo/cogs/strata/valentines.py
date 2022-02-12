@@ -5,40 +5,42 @@ from discord.ext.commands import BucketType, Cog, Context, command, cooldown
 from lambo import CustomClient
 
 
+def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
+    channel = bot.get_channel(channel_id)
+    if not channel:
+        raise ValueError(f"Channel with id {channel_id} not found.")
+    if channel.type != discord.ChannelType.text:  # type: ignore
+        raise ValueError(f"Channel with id {channel_id} is not a text channel.")
+    return channel  # type: ignore
+
+
 class ValentinesCog(Cog, name="Valentines"):
 
     VALENTINES_CHANNEL_ID = 941365482731216936
+    ANNOUNCEMENT_CHANNEL_ID = 412146574823784468
     SPAM_CHANNEL_ID = 412151174641221632
     EMBED_COLOUR = discord.Colour(0xEA4242)
 
     @property
     def valentines_channel(self) -> discord.TextChannel:
-        channel = self.bot.get_channel(self.VALENTINES_CHANNEL_ID)
-        if not channel:
-            raise RuntimeError(
-                f"Could not find channel with id {self.VALENTINES_CHANNEL_ID}"
-            )
-        if not channel.type == discord.ChannelType.text:  # type: ignore
-            raise RuntimeError(
-                f"Channel with id {self.VALENTINES_CHANNEL_ID} is not a text channel"
-            )
-        return channel  # type: ignore
+        return get_text_channel(self.bot, self.VALENTINES_CHANNEL_ID)
 
     @property
     def spam_channel(self) -> discord.TextChannel:
-        channel = self.bot.get_channel(self.SPAM_CHANNEL_ID)
-        if not channel:
-            raise RuntimeError(f"Could not find channel with id {self.SPAM_CHANNEL_ID}")
-        if not channel.type == discord.ChannelType.text:  # type: ignore
-            raise RuntimeError(
-                f"Channel with id {self.VALENTINES_CHANNEL_ID} is not a text channel"
-            )
-        return channel  # type: ignore
+        return get_text_channel(self.bot, self.SPAM_CHANNEL_ID)
+
+    @property
+    def announcement_channel(self) -> discord.TextChannel:
+        return get_text_channel(self.bot, self.ANNOUNCEMENT_CHANNEL_ID)
 
     bot: CustomClient
 
     def __init__(self, bot: CustomClient) -> None:
         self.bot = bot
+
+    async def post_announcement(self) -> None:
+        message = f"Na kanale {self.valentines_channel.mention} została wysłana nowa propozycja shipu!"
+        await self.announcement_channel.send(message)
 
     @cooldown(1, 60, BucketType.user)
     @command(
@@ -68,7 +70,11 @@ class ValentinesCog(Cog, name="Valentines"):
             colour=self.EMBED_COLOUR, title="PROPOZYCJA SHIPU:", description=message
         )
         msg = await self.valentines_channel.send(embed=embed)
-        await asyncio.gather(*[msg.add_reaction(emoji) for emoji in ["❤️", "💔"]])
+        actions = [
+            *[msg.add_reaction(emoji) for emoji in ("❤️", "💔")],
+            self.post_announcement(),
+        ]
+        await asyncio.gather(*actions)
 
 
 def setup(bot: CustomClient):
