@@ -9,7 +9,7 @@ class ValentinesCog(Cog, name="Valentines"):
 
     VALENTINES_CHANNEL_ID = 941365482731216936
     SPAM_CHANNEL_ID = 412151174641221632
-    EMBED_PINK = discord.Colour(0xF7A9E9)
+    EMBED_COLOUR = discord.Colour(0xEA4242)
 
     @property
     def valentines_channel(self) -> discord.TextChannel:
@@ -65,7 +65,7 @@ class ValentinesCog(Cog, name="Valentines"):
         ]
         message = "\n".join(message_builder)
         embed = discord.Embed(
-            colour=self.EMBED_PINK, title="PROPOZYCJA SHIPU:", description=message
+            colour=self.EMBED_COLOUR, title="PROPOZYCJA SHIPU:", description=message
         )
         msg = await self.valentines_channel.send(embed=embed)
         await asyncio.gather(*[msg.add_reaction(emoji) for emoji in ["❤️", "💔"]])
