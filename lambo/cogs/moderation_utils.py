@@ -90,12 +90,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
     async def channel_permissions_add(
         self,
         ctx: Context,
-        channel: typing.Union[
-            discord.TextChannel,
-            discord.CategoryChannel,
-            discord.VoiceChannel,
-            discord.StageChannel,
-        ],
+        channel: discord.abc.GuildChannel,
         member: discord.Member,
         *,
         permissions: PermissionsFor,
