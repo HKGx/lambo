@@ -1,9 +1,9 @@
+from inspect import unwrap
 import math
-from textwrap import dedent
-from tokenize import triple_quoted
+import typing
 
 import discord
-from discord.ext.commands import Cog, Context, command, FlagConverter, flag
+from discord.ext.commands import Cog, Context, command, FlagConverter, flag, Greedy
 from discord.ext.pages import PageGroup, Paginator
 from discord.utils import escape_markdown
 from lambo import CustomClient
@@ -77,6 +77,51 @@ class UtilitiesCog(Cog, name="Utilities"):
         paginator.current_page = flags.page - 1
 
         await paginator.send(ctx)
+
+    @command("searchin")
+    async def searchin(
+        self,
+        ctx: Context,
+        _channels: Greedy[discord.abc.GuildChannel],
+        prefix: typing.Optional[str] = "in:",
+        only_available: typing.Optional[bool] = False,
+    ):
+        channels: list[discord.abc.GuildChannel] = _channels  # type: ignore
+        unwrapped_channels = {
+            unwrapped for channel in channels for unwrapped in unwrap_channels(channel)
+        }
+        if only_available:
+            unwrapped_channels = {
+                channel for channel in unwrapped_channels if channel.permissions_for(ctx.author).read_messages  # type: ignore
+            }
+
+        texts = [f"{prefix}{unwrapped.name}" for unwrapped in unwrapped_channels]
+        return await ctx.reply(codized(" ".join(texts)))
+
+
+def unwrap_channels(
+    channel: discord.abc.GuildChannel,
+) -> typing.List[
+    typing.Union[
+        discord.TextChannel,
+        discord.VoiceChannel,
+        discord.CategoryChannel,
+        discord.StageChannel,
+    ]
+]:
+    if isinstance(channel, discord.TextChannel):
+        return [channel]
+    if isinstance(channel, discord.VoiceChannel):
+        return [channel]
+    if isinstance(channel, discord.StageChannel):
+        return [channel]
+    if isinstance(channel, discord.CategoryChannel):
+        return [
+            unwrapped
+            for child in channel.channels
+            for unwrapped in unwrap_channels(child)
+        ]
+    raise ValueError(f"Unknown channel type: {channel}")
 
 
 def quoted(text: str) -> str:
