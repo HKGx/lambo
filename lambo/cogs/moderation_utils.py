@@ -40,7 +40,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
 
     @role.command(name="create")
     @has_permissions(manage_roles=True)
-    async def role_create(self, ctx: Context, name: str, after: discord.Role = None):
+    async def role_create(self, ctx: Context, name: str, after: typing.Optional[discord.Role] = None):
         if after is None:
             after = ctx.guild.default_role
         assert after is not None, "after is None"

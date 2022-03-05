@@ -1,7 +1,8 @@
 from datetime import datetime
+import typing
 
 import discord
-from discord.ext.commands import Cog, Context, group, is_owner
+from discord.ext.commands import Cog, Context, group, is_owner, FlagConverter, flag
 from discord.utils import DISCORD_EPOCH
 from lambo import CustomClient
 from lambo.models.used_emoji_model import UsedEmojiModel
@@ -20,10 +21,14 @@ def get_guild_emojis_from_str(string: str, guild: discord.Guild) -> set[str]:
 
 
 def parse_message(message: discord.Message) -> list[UsedEmojiModel]:
-    emojis = get_guild_emojis_from_str(
-        message.content, message.guild)  # type: ignore
+    emojis = get_guild_emojis_from_str(message.content, message.guild)  # type: ignore
     author_id: int = message.author.id  # type: ignore
-    return [UsedEmojiModel(emoji=emoji, used_by=str(author_id), timestamp=message.created_at) for emoji in emojis]
+    return [
+        UsedEmojiModel(
+            emoji=emoji, used_by=str(author_id), timestamp=message.created_at
+        )
+        for emoji in emojis
+    ]
 
 
 def get_timestamp_tag(timestamp: datetime) -> str:
@@ -31,6 +36,13 @@ def get_timestamp_tag(timestamp: datetime) -> str:
         timestamp = _EPOCH
     from_unix = int(datetime.timestamp(timestamp))
     return f"<t:{from_unix}>"
+
+
+class RankingFlags(FlagConverter):
+    reversed: bool = flag(name="reversed", aliases=["rev"], default=False)
+    # animated_only: bool = flag(name="animated", aliases=["a"], default=False)
+    # static_only: bool = flag(name="static", aliases=["s"], default=False)
+    page: int = flag(name="page", default=1)
 
 
 class CountEmojiCog(Cog, name="Emoji Counting"):
@@ -56,45 +68,69 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         pass
 
     @emojis.command(name="count", aliases=("c",))
-    async def emojis_count(self, ctx: Context, emoji: discord.Emoji, from_date: DateConverter = None, to_date: DateConverter = None):
+    async def emojis_count(
+        self,
+        ctx: Context,
+        emoji: discord.Emoji,
+        from_date: typing.Optional[DateConverter] = None,
+        to_date: typing.Optional[DateConverter] = None,
+    ):
         if emoji.guild is None:
             await ctx.send("This emoji is not in a guild.")
             return
-        from_: datetime = datetime.combine(
-            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
-        to_: datetime = datetime.combine(
-            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
+        from_: datetime = (
+            datetime.combine(from_date, datetime.min.time())  # type: ignore
+            if from_date is not None
+            else _EPOCH
+        )
+        to_: datetime = (
+            datetime.combine(to_date, datetime.max.time())  # type: ignore
+            if to_date is not None
+            else datetime.now()
+        )
         emojis_count = await UsedEmojiModel.filter(
-            emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
+            emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_
+        ).count()
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
-        await ctx.send(f"{emoji} was used {emojis_count} times from {from_str} to {to_str}.")
+        await ctx.send(
+            f"{emoji} was used {emojis_count} times from {from_str} to {to_str}."
+        )
 
     @emojis.command(name="users", aliases=("u",))
-    async def emojis_users(self, ctx: Context, emoji: discord.Emoji, from_date: DateConverter = None, to_date: DateConverter = None):
+    async def emojis_users(
+        self,
+        ctx: Context,
+        emoji: discord.Emoji,
+        from_date: typing.Optional[DateConverter] = None,
+        to_date: typing.Optional[DateConverter] = None,
+    ):
         if emoji.guild is None:
             await ctx.send("This emoji is not in a guild.")
             return
-        from_: datetime = datetime.combine(
-            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
-        to_: datetime = datetime.combine(
-            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
+        from_: datetime = (
+            datetime.combine(from_date, datetime.min.time())  # type: ignore
+            if from_date is not None
+            else _EPOCH
+        )
+        to_: datetime = (
+            datetime.combine(to_date, datetime.max.time())  # type: ignore
+            if to_date is not None
+            else datetime.now()
+        )
         # Get all users who used the emoji and their count
         users: list[dict[str, int]] = (
-            await UsedEmojiModel
-            .annotate(count=Count("used_by"))
+            await UsedEmojiModel.annotate(count=Count("used_by"))
             .group_by("used_by")
             .order_by("-count")
-            .filter(
-                emoji=emoji.name,
-                timestamp__gte=from_,
-                timestamp__lte=to_
-            ).limit(10)
+            .filter(emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_)
+            .limit(10)
             .values("used_by", "count")  # type: ignore
         )
         # All usages during the time period
         emojis_count = await UsedEmojiModel.filter(
-            emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_).count()
+            emoji=emoji.name, timestamp__gte=from_, timestamp__lte=to_
+        ).count()
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
 
@@ -105,18 +141,37 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         await ctx.send(sb, allowed_mentions=discord.AllowedMentions(users=False))
 
     @emojis.command(name="rank", aliases=("r", "ranking"))
-    async def emojis_rank(self, ctx: Context, from_date: DateConverter = None, to_date: DateConverter = None):
-        from_: datetime = datetime.combine(
-            from_date, datetime.min.time()) if from_date is not None else _EPOCH  # type: ignore
-        to_: datetime = datetime.combine(
-            to_date, datetime.max.time()) if to_date is not None else datetime.now()  # type: ignore
+    async def emojis_rank(
+        self,
+        ctx: Context,
+        from_date: typing.Optional[DateConverter] = None,
+        to_date: typing.Optional[DateConverter] = None,
+        *,
+        flags: RankingFlags,
+    ):
+        # if flags.animated_only and flags.static_only:
+        #     await ctx.reply("You can't use both animated and static flags.")
+        #     return
+        from_: datetime = (
+            datetime.combine(from_date, datetime.min.time())  # type: ignore
+            if from_date is not None
+            else _EPOCH
+        )
+        to_: datetime = (
+            datetime.combine(to_date, datetime.max.time())  # type: ignore
+            if to_date is not None
+            else datetime.now()
+        )
 
-        values: list[dict[str, int | str]] = (await UsedEmojiModel.annotate(count=Count("id"))  # type: ignore
-                                              .filter(timestamp__gte=from_, timestamp__lte=to_)
-                                              .limit(10)
-                                              .group_by("emoji")
-                                              .order_by("-count")
-                                              .values("emoji", "count"))
+        values: list[dict[str, int | str]] = (
+            await UsedEmojiModel.annotate(count=Count("id"))  # type: ignore
+            .filter(timestamp__gte=from_, timestamp__lte=to_)
+            .offset((flags.page - 1) * 10)
+            .limit(10)
+            .group_by("emoji")
+            .order_by("-count" if flags.reversed else "count")
+            .values("emoji", "count")
+        )
 
         from_str = get_timestamp_tag(from_)
         to_str = get_timestamp_tag(to_)
@@ -136,19 +191,31 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
 
     @is_owner()
     @emojis.command(name="load-history", hidden=True)
-    async def load_history(self, ctx: Context, limit: int, before: discord.Message = None):
+    async def load_history(
+        self, ctx: Context, limit: int, before: typing.Optional[discord.Message] = None
+    ):
         before_message: discord.Message = before if before is not None else ctx.message  # type: ignore
         limit = min(limit, 10000)
         await ctx.send("Loading history...")
         i = 0
         last = before_message
         async with ctx.typing():
-            channel: discord.TextChannel = ctx.channel   # type: ignore
+            channel: discord.TextChannel = ctx.channel  # type: ignore
             async for message in channel.history(limit=limit, before=before_message):
                 if message.author.bot:  # type: ignore
                     continue
-                if message.content.startswith(self.bot.command_prefix):
-                    continue
+                prefix = await self.bot.get_prefix(message)
+                if isinstance(prefix, str):
+                    if message.content.startswith(prefix):
+                        continue
+                elif isinstance(prefix, list):
+                    starts_with_prefix = False
+                    for p in prefix:
+                        if message.content.startswith(p):
+                            starts_with_prefix = True
+                            break
+                    if starts_with_prefix:
+                        continue
                 parse = parse_message(message)
                 last = message
                 await UsedEmojiModel.bulk_create(parse)
