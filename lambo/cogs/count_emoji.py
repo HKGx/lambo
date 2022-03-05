@@ -169,7 +169,7 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
             .offset((flags.page - 1) * 10)
             .limit(10)
             .group_by("emoji")
-            .order_by("-count" if flags.reversed else "count")
+            .order_by("count" if flags.reversed else "-count")
             .values("emoji", "count")
         )
 
