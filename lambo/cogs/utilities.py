@@ -134,3 +134,19 @@ def codized(text: str) -> str:
 
 def setup(bot: CustomClient):
     bot.add_cog(UtilitiesCog(bot))
+
+
+def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
+    channel = bot.get_channel(channel_id)
+    if not channel:
+        raise ValueError(f"Channel with id {channel_id} not found.")
+    if channel.type != discord.ChannelType.text:  # type: ignore
+        raise ValueError(f"Channel with id {channel_id} is not a text channel.")
+    return channel  # type: ignore
+
+
+def get_guild(bot: CustomClient, guild_id: int) -> discord.Guild:
+    guild = bot.get_guild(guild_id)
+    if not guild:
+        raise ValueError(f"Guild with id {guild_id} not found.")
+    return guild

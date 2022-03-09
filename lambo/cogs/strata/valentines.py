@@ -3,15 +3,7 @@ import asyncio
 import discord
 from discord.ext.commands import BucketType, Cog, Context, command, cooldown
 from lambo import CustomClient
-
-
-def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
-    channel = bot.get_channel(channel_id)
-    if not channel:
-        raise ValueError(f"Channel with id {channel_id} not found.")
-    if channel.type != discord.ChannelType.text:  # type: ignore
-        raise ValueError(f"Channel with id {channel_id} is not a text channel.")
-    return channel  # type: ignore
+from lambo.cogs.utilities import get_text_channel
 
 
 class ValentinesCog(Cog, name="Valentines"):
