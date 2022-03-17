@@ -1,13 +1,13 @@
-from inspect import unwrap
 import math
 import typing
+from inspect import unwrap
 
 import discord
-from discord.ext.commands import Cog, Context, command, FlagConverter, flag, Greedy
+from discord.ext.commands import Cog, Context, FlagConverter, Greedy, command, flag
 from discord.ext.pages import PageGroup, Paginator
 from discord.utils import escape_markdown
 from lambo import CustomClient
-from lambo.utils import FuzzyRoleConverter
+from lambo.utils import FuzzyRoleConverter, codized, quoted, unwrap_channels
 
 
 class InroleFlags(FlagConverter):
@@ -99,54 +99,5 @@ class UtilitiesCog(Cog, name="Utilities"):
         return await ctx.reply(codized(" ".join(texts)))
 
 
-def unwrap_channels(
-    channel: discord.abc.GuildChannel,
-) -> typing.List[
-    typing.Union[
-        discord.TextChannel,
-        discord.VoiceChannel,
-        discord.CategoryChannel,
-        discord.StageChannel,
-    ]
-]:
-    if isinstance(channel, discord.TextChannel):
-        return [channel]
-    if isinstance(channel, discord.VoiceChannel):
-        return [channel]
-    if isinstance(channel, discord.StageChannel):
-        return [channel]
-    if isinstance(channel, discord.CategoryChannel):
-        return [
-            unwrapped
-            for child in channel.channels
-            for unwrapped in unwrap_channels(child)
-        ]
-    raise ValueError(f"Unknown channel type: {channel}")
-
-
-def quoted(text: str) -> str:
-    return "\n".join(f"> {line}" for line in text.splitlines())
-
-
-def codized(text: str) -> str:
-    return f"```\n{text}\n```"
-
-
 def setup(bot: CustomClient):
     bot.add_cog(UtilitiesCog(bot))
-
-
-def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
-    channel = bot.get_channel(channel_id)
-    if not channel:
-        raise ValueError(f"Channel with id {channel_id} not found.")
-    if channel.type != discord.ChannelType.text:  # type: ignore
-        raise ValueError(f"Channel with id {channel_id} is not a text channel.")
-    return channel  # type: ignore
-
-
-def get_guild(bot: CustomClient, guild_id: int) -> discord.Guild:
-    guild = bot.get_guild(guild_id)
-    if not guild:
-        raise ValueError(f"Guild with id {guild_id} not found.")
-    return guild

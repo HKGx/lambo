@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord.ext.commands import BucketType, Cog, Context, command, cooldown
 from lambo import CustomClient
-from lambo.cogs.utilities import get_text_channel
+from lambo.utils import get_text_channel
 
 
 class ValentinesCog(Cog, name="Valentines"):
