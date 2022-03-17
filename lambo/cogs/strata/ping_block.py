@@ -50,16 +50,17 @@ class RolePingBlockCog(Cog, name="Role Ping Blocking"):
                     await message.author.timeout_for(
                         self.TIMEOUT_TIME, reason="Role ping block"
                     )
+                    await message.channel.send(
+                        f"Hej {message.author.mention}, otrzymałeś wyciszenie na 8 godzin"
+                        ", ponieważ spingowałeś rolę 2 razy w ciągu 30 ostatnich minut. "
+                        "Jest to zabezpieczenie, które ma chronić serwer przed masowym "
+                        "pingowaniem roli. Spokojnie, Twoje wyciszenie nie będzie "
+                        "liczyło się do historii mutów i niedługo ktoś z Support Teamu "
+                        "sprawdzi czy twój podwójny ping był przez przypadek, czy też był celowy."
+                    )
                 except discord.Forbidden:
-                    await message.channel.send("Nie nadużywaj permisji.")
-                await message.channel.send(
-                    f"Hej {message.author.mention}, otrzymałeś wyciszenie na 8 godzin"
-                    ", ponieważ spingowałeś rolę 2 razy w ciągu 30 ostatnich minut. "
-                    "Jest to zabezpieczenie, które ma chronić serwer przed masowym "
-                    "pingowaniem roli. Spokojnie, Twoje wyciszenie nie będzie "
-                    "liczyło się do historii mutów i niedługo ktoś z Support Teamu "
-                    "sprawdzi czy twój podwójny ping był przez przypadek, czy też był celowy."
-                )
+                    await message.channel.send("Nie mogłem nadać wyciszenia.")
+
                 return
         self.cache[message.author.id] = None
         dt = format_dt(datetime.now() + self.PING_COOLDOWN)
