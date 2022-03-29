@@ -1,6 +1,8 @@
 .env
 __pycache__/
 .vscode
+.idea
+/data
 db.sqlite3*
 lambo/cogs/wip*/
 
