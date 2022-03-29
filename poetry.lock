@@ -192,7 +192,7 @@ voice = ["PyNaCl (>=1.3.0,<1.6)"]
 type = "git"
 url = "https://github.com/Pycord-Development/pycord.git"
 reference = "master"
-resolved_reference = "91460142ed530a4e13b5c9bb143de2d6e330b459"
+resolved_reference = "411b6c3f4adbbf508d2b5c482dfa52e66a649336"
 
 [[package]]
 name = "pycodestyle"
@@ -231,7 +231,7 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pypika-tortoise"
-version = "0.1.3"
+version = "0.1.4"
 description = "Forked from pypika and streamline just for tortoise-orm"
 category = "main"
 optional = false
@@ -261,7 +261,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "python-dotenv"
-version = "0.19.2"
+version = "0.20.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
 category = "main"
 optional = false
@@ -272,7 +272,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "pytz"
-version = "2021.3"
+version = "2022.1"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
@@ -639,20 +639,20 @@ pyparsing = [
     {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
 ]
 pypika-tortoise = [
-    {file = "pypika-tortoise-0.1.3.tar.gz", hash = "sha256:ecdf2d6e0aeb0e15880d9e2ead41362ec7320f37fb25a3a71664c2e1105ad218"},
-    {file = "pypika_tortoise-0.1.3-py3-none-any.whl", hash = "sha256:28fb2715a94ff2f3bc1c4ef6cc46c385c244c27d100aac760231bf612361d5ba"},
+    {file = "pypika-tortoise-0.1.4.tar.gz", hash = "sha256:f4b4e6c72fc13f49058181928e66930b59fee988823c8fd01498f95e2ff788ca"},
+    {file = "pypika_tortoise-0.1.4-py3-none-any.whl", hash = "sha256:bdc7e63c88791679a8b3f0b008582b6d3fcd21830650d274db35a7012e7b8bcd"},
 ]
 pytest = [
     {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
     {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
 ]
 python-dotenv = [
-    {file = "python-dotenv-0.19.2.tar.gz", hash = "sha256:a5de49a31e953b45ff2d2fd434bbc2670e8db5273606c1e737cc6b93eff3655f"},
-    {file = "python_dotenv-0.19.2-py2.py3-none-any.whl", hash = "sha256:32b2bdc1873fd3a3c346da1c6db83d0053c3c62f28f1f38516070c4c8971b1d3"},
+    {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
+    {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
 ]
 pytz = [
-    {file = "pytz-2021.3-py2.py3-none-any.whl", hash = "sha256:3672058bc3453457b622aab7a1c3bfd5ab0bdae451512f6cf25f64ed37f5b87c"},
-    {file = "pytz-2021.3.tar.gz", hash = "sha256:acad2d8b20a1af07d4e4c9d2e9285c5ed9104354062f275f3fcd88dcef4f1326"},
+    {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
+    {file = "pytz-2022.1.tar.gz", hash = "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
