@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+import re
 import typing
 
 import discord
@@ -26,7 +27,7 @@ class FuzzyRoleConverter(RoleConverter):
             return matching_roles[0]
 
 
-class DateConverter(Converter):
+class DateConverter(Converter[date]):
     async def convert(self, ctx: Context, argument: str) -> date:
         # Parse the date from the argument string.
         # Date is expected to be in a human readble format.
@@ -47,6 +48,28 @@ class DateConverter(Converter):
                             f"Date format not recognized. Please use one of the following formats: "
                             f"`yyyy-mm-dd`, `yyyy.mm.dd`, `dd.mm.yyyy`, `dd-mm-yyyy`"
                         )
+
+
+class TimedeltaConverter(Converter[timedelta]):
+
+    REGEX = re.compile(
+        r"((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?"
+    )
+
+    async def convert(self, ctx: Context, argument: str) -> timedelta:
+        matches = re.match(self.REGEX, argument)
+        if matches is None or all(v is None for v in matches.groups()):
+            raise ValueError(
+                f"Invalid time format. Please use one of the following formats: `<days>d`, <hours>h`, `<minutes>m`, `<seconds>s`"
+            )
+
+        return timedelta(
+            **{
+                key: int(value)
+                for key, value in matches.groupdict().items()
+                if value is not None
+            }
+        )
 
 
 def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
@@ -82,11 +105,9 @@ def unwrap_channels(
         discord.StageChannel,
     ]
 ]:
-    if isinstance(channel, discord.TextChannel):
-        return [channel]
-    if isinstance(channel, discord.VoiceChannel):
-        return [channel]
-    if isinstance(channel, discord.StageChannel):
+    if isinstance(
+        channel, (discord.TextChannel, discord.VoiceChannel, discord.StageChannel)
+    ):
         return [channel]
     if isinstance(channel, discord.CategoryChannel):
         return [
@@ -103,3 +124,15 @@ def quoted(text: str) -> str:
 
 def codized(text: str) -> str:
     return f"```\n{text}\n```"
+
+
+REPLACE_REGEX = re.compile(r"{(?P<key>\w+):(?P<value>\d+)}")
+
+
+def replace_values(string: str, **kwargs: typing.Callable[[str], str]) -> str:
+    def replacer(match: re.Match[str]) -> str:
+        key: str = match.group("key")
+        value: str = match.group("value")
+        return kwargs[key](value)
+
+    return REPLACE_REGEX.sub(replacer, string)
