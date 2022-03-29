@@ -16,12 +16,14 @@ bot = CustomClient(config)
 
 
 async def run():
-    await Tortoise.init(db_url=config.db_url, modules={"models": config.models})
+    await Tortoise.init(
+        db_url=config.db_url,
+        modules={"lambo": [*config.models, *config.non_default_models]},
+    )
     await Tortoise.generate_schemas()
     extensions = [*config.extensions, *config.non_default_extensions]
     for extension in extensions:
         bot.load_extension(extension)
-        print(f"Loaded extension `{extension}`")
 
     await bot.start()
 
