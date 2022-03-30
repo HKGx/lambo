@@ -165,6 +165,30 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             f"Stage {stage_index} is now {'enabled' if enable else 'disabled'} for channel {channel}"
         )
 
+    @command(name="messages_in")
+    async def get_messages_in(
+        self, ctx: Context, channel: Optional[discord.TextChannel] = None
+    ):
+        if channel is None:
+            channel = ctx.channel  # type: ignore
+        assert channel is not None
+        if channel.guild.id not in self.ALLOWED_GUILD_IDS:
+            return
+        if channel.id not in self.ALLOWED_CHANNELS:
+            return
+        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
+        if not role:
+            return
+        today = date.today()
+        today = date.today()
+        model, created = await ActivityTrackerModel.get_or_create(
+            channel_id=channel.id, date=today
+        )
+        if created:
+            default_stages = await StageModel.filter(default=True)
+            await model.stages.add(*default_stages)
+        await ctx.reply(f"{model.messages_sent} messages sent in {channel}")
+
 
 def setup(bot: CustomClient):
     bot.add_cog(ActivityTracker(bot))
