@@ -32,9 +32,10 @@ class ActivityTracker(Cog, name="Activity Tracker"):
         if stage.is_basic_stage():
             await channel.send(stage.response_message)
         elif stage.is_giveaway_stage():
-            await GiveawayCog.create_giveaway(
+            _, msg = await GiveawayCog.create_giveaway(
                 stage.giveaway_time, stage.winners, stage.response_message, channel
             )
+            await msg.pin()
 
     @Cog.listener("on_message")
     async def on_message(self, message: discord.Message):

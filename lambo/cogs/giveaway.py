@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 from random import sample
-from typing import Optional, Union, overload
+from typing import Optional, Tuple, Union, overload
 import discord
 
 from discord.embeds import EmptyEmbed
@@ -61,7 +61,7 @@ class GiveawayCog(Cog, name="Template"):
         prize: str,
         channel: discord.TextChannel,
         author: Optional[Union[discord.Member, discord.User]] = None,
-    ) -> GiveawayModel:
+    ) -> Tuple[GiveawayModel, discord.Message]:
         ...
 
     @overload
@@ -72,7 +72,7 @@ class GiveawayCog(Cog, name="Template"):
         prize: str,
         channel: discord.TextChannel,
         author: Optional[Union[discord.Member, discord.User]] = None,
-    ) -> GiveawayModel:
+    ) -> Tuple[GiveawayModel, discord.Message]:
         ...
 
     @staticmethod
@@ -82,7 +82,7 @@ class GiveawayCog(Cog, name="Template"):
         prize: str,
         channel: discord.TextChannel,
         author: Optional[Union[discord.Member, discord.User]] = None,
-    ) -> GiveawayModel:
+    ) -> Tuple[GiveawayModel, discord.Message]:
 
         msg = await channel.send(content="Giveaway, add reactions to enter")
         if isinstance(end_time, timedelta):
@@ -97,7 +97,7 @@ class GiveawayCog(Cog, name="Template"):
         embed = GiveawayCog.giveaway_embed(giveaway, author)
         await msg.edit(embed=embed)
         await msg.add_reaction("🎉")
-        return giveaway
+        return (giveaway, msg)
 
     @staticmethod
     async def end_giveaway(bot: CustomClient, giveaway: GiveawayModel) -> GiveawayModel:
