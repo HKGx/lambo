@@ -189,6 +189,14 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             await model.stages.add(*default_stages)
         await ctx.reply(f"{model.messages_sent} messages sent in {channel}")
 
+    @command("remove_stage")
+    async def remove_stage(self, ctx: Context, idx: int):
+        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
+        if not role:
+            return
+        model = await StageModel.get(idx=idx)
+        await model.delete()
+
 
 def setup(bot: CustomClient):
     bot.add_cog(ActivityTracker(bot))
