@@ -57,12 +57,11 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             await model.stages.add(*default_stages)
 
         model.messages_sent += 1  # type: ignore
+        await model.save(update_fields=("messages_sent",))
         stages = await model.stages.filter(messages_needed=model.messages_sent)
         await asyncio.gather(
             *[self.handle_stage(stage, message.channel) for stage in stages]
         )
-        await model.save(update_fields=("messages_sent",))
-        # get stages for current message count
 
     @command(name="list_stages")
     async def get_stages(self, ctx: Context) -> None:
