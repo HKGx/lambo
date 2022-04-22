@@ -37,7 +37,7 @@ class UtilitiesCog(Cog, name="Utilities"):
 
     @command("inrole")
     async def inrole(
-        self, ctx: Context, _role: Greedy[FuzzyRoleConverter], *, flags: InroleFlags
+        self, ctx: Context, _role: FuzzyRoleConverter, *, flags: InroleFlags
     ) -> None:
         if not (1 <= flags.per_page <= 30):
             await ctx.reply("Please enter a number between 1 and 30.")
