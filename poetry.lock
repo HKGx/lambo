@@ -173,7 +173,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "py-cord"
-version = "2.0.0b5"
+version = "2.0.0b7"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
@@ -184,7 +184,7 @@ develop = false
 aiohttp = ">=3.6.0,<3.9.0"
 
 [package.extras]
-docs = ["sphinx (==4.4.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "myst-parser"]
+docs = ["sphinx (==4.5.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "myst-parser"]
 speed = ["orjson (>=3.5.4)", "aiodns (>=1.1)", "brotlipy", "cchardet"]
 voice = ["PyNaCl (>=1.3.0,<1.6)"]
 
@@ -192,7 +192,7 @@ voice = ["PyNaCl (>=1.3.0,<1.6)"]
 type = "git"
 url = "https://github.com/Pycord-Development/pycord.git"
 reference = "master"
-resolved_reference = "411b6c3f4adbbf508d2b5c482dfa52e66a649336"
+resolved_reference = "9116cb2ea5bec10b62e890ee39f8c1c16249662a"
 
 [[package]]
 name = "pycodestyle"
@@ -220,14 +220,14 @@ email = ["email-validator (>=1.0.3)"]
 
 [[package]]
 name = "pyparsing"
-version = "3.0.7"
-description = "Python parsing module"
+version = "3.0.8"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.6.8"
 
 [package.extras]
-diagrams = ["jinja2", "railroad-diagrams"]
+diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pypika-tortoise"
@@ -635,8 +635,8 @@ pydantic = [
     {file = "pydantic-1.9.0.tar.gz", hash = "sha256:742645059757a56ecd886faf4ed2441b9c0cd406079c2b4bee51bcc3fbcd510a"},
 ]
 pyparsing = [
-    {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
-    {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
+    {file = "pyparsing-3.0.8-py3-none-any.whl", hash = "sha256:ef7b523f6356f763771559412c0d7134753f037822dad1b16945b7b846f7ad06"},
+    {file = "pyparsing-3.0.8.tar.gz", hash = "sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954"},
 ]
 pypika-tortoise = [
     {file = "pypika-tortoise-0.1.4.tar.gz", hash = "sha256:f4b4e6c72fc13f49058181928e66930b59fee988823c8fd01498f95e2ff788ca"},
