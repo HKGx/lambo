@@ -1,3 +1,5 @@
+import asyncio
+from io import StringIO
 import typing
 
 import discord
@@ -59,6 +61,49 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         async with ctx.typing():
             await role.edit(position=after.position)
             await ctx.reply(f"Moved role {role.name} with id {role.id}")
+
+    @role.command(name="fuse")
+    @has_permissions(manage_roles=True)
+    async def fuse_roles(
+        self, ctx: Context, from_role: discord.Role, to_role: discord.Role
+    ):
+        """
+        Add members from role2 to role1
+        """
+        if from_role == to_role:
+            await ctx.reply("Cannot fuse a role with itself")
+        author: typing.Union[discord.Member, discord.User] = ctx.author  # type: ignore
+        assert isinstance(author, discord.Member), "author is not a member"
+        if (
+            len(from_role.members) > 100
+            and len(to_role.members) > 100
+            and not await self.bot.is_owner(author._user)
+        ):
+            await ctx.reply(
+                "Cannot fuse more than 100 members unless you're the bot owner"
+            )
+            return
+        msg = await ctx.reply(f"Fusing {from_role.name} and {to_role.name}")
+        async with ctx.typing():
+            members: StringIO = StringIO()
+            coros: list[typing.Awaitable] = []
+            for member in from_role.members:
+                if member in to_role.members:
+                    continue
+                members.write(f"{member} ({member.id})\n")
+                coros.append(
+                    member.add_roles(
+                        to_role,
+                        reason=f"Fusing {from_role.name} and {to_role.name}",
+                    )
+                )
+            await msg.edit(
+                content="Fetched all members from role2. Waiting for them to be added to role1"
+            )
+            await asyncio.gather(*coros)
+            await msg.edit(content=f"Fused {from_role.name} and {to_role.name}")
+            members.seek(0)
+            await msg.reply(file=discord.File(members, filename="members_fused.txt"))  # type: ignore
 
     @group(name="channel", aliaess=["ch"], invoke_without_command=False)
     async def channel(self, ctx: Context):
