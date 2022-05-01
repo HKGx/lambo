@@ -1,3 +1,4 @@
+from io import BytesIO
 import math
 import typing
 from inspect import unwrap
@@ -97,6 +98,49 @@ class UtilitiesCog(Cog, name="Utilities"):
 
         texts = [f"{prefix}{unwrapped.name}" for unwrapped in unwrapped_channels]
         return await ctx.reply(codized(" ".join(texts)))
+
+    @command("reacted", aliases=["rnr"])
+    async def reacted(
+        self,
+        ctx: Context,
+        message: discord.Message,
+        role: typing.Optional[discord.Role],
+    ):
+        assert ctx.guild is not None
+        assert isinstance(message.channel, discord.abc.GuildChannel)
+        members = filter(
+            lambda m: not m.bot, role.members if role else message.channel.members
+        )
+        reacted_users: set[discord.Member] = set()
+        reactions_dict: dict[str, list[discord.Member]] = {}
+        for reaction in message.reactions:
+            users: list[discord.Member] = await (  # type: ignore
+                reaction.users(limit=None)
+                .filter(lambda user: not user.bot and isinstance(user, discord.Member))
+                .flatten()
+            )
+            reacted_users.update(users)
+            emoji_name = (
+                reaction.emoji
+                if isinstance(reaction.emoji, str)
+                else reaction.emoji.name
+            )
+            reactions_dict[emoji_name] = users
+        not_reacted = set(members) - reacted_users
+
+        buffer = ""
+
+        for emoji, users in reactions_dict.items():
+            buffer += f"{emoji}: {len(users)}\n"
+            for user in users:
+                buffer += f"\t{user}\n"
+        buffer += f"\nNot reacted: {len(not_reacted)}\n"
+        for user in not_reacted:
+            buffer += f"\t{user}\n"
+
+        await ctx.reply(
+            file=discord.File(BytesIO(buffer.encode("utf-8")), filename="reacted.txt")
+        )
 
 
 def setup(bot: CustomClient):
