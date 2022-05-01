@@ -45,6 +45,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
     async def role_create(
         self, ctx: Context, name: str, after: typing.Optional[discord.Role] = None
     ):
+        assert ctx.guild is not None
         if after is None:
             after = ctx.guild.default_role
         assert after is not None, "after is None"
@@ -130,6 +131,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         channel: discord.abc.GuildChannel,
         permission: discord.flags.flag_value,
     ) -> bool:
+        assert ctx.guild is not None
         perm = discord.Permissions(permission.flag)
         return channel.permissions_for(ctx.guild.me) >= perm
 
