@@ -1,12 +1,13 @@
-from io import BytesIO
 import math
 import typing
 from inspect import unwrap
+from io import BytesIO
 
 import discord
 from discord.ext.commands import Cog, Context, FlagConverter, Greedy, command, flag
 from discord.ext.pages import PageGroup, Paginator
 from discord.utils import escape_markdown
+
 from lambo import CustomClient
 from lambo.utils import FuzzyRoleConverter, codized, quoted, unwrap_channels
 

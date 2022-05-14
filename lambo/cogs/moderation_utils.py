@@ -1,9 +1,10 @@
 import asyncio
-from io import StringIO
 import typing
+from io import StringIO
 
 import discord
 from discord.ext.commands import Cog, Context, FlagConverter, group, has_permissions
+
 from lambo import CustomClient
 from lambo.utils import FuzzyRoleConverter
 

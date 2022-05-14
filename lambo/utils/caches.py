@@ -13,7 +13,6 @@ from typing import (
     Union,
 )
 
-
 K = TypeVar("K")
 V = TypeVar("V")
 

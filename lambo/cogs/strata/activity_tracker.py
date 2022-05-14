@@ -4,6 +4,7 @@ from typing import Optional
 
 import discord
 from discord.ext.commands import Cog, Context, command
+
 from lambo import CustomClient
 from lambo.cogs.giveaway import GiveawayCog
 from lambo.models.activity_tracker_model import StageModel

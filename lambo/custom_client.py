@@ -1,10 +1,11 @@
+from logging import BASIC_FORMAT, DEBUG, Formatter, Logger, StreamHandler, getLogger
 from typing import Optional
+
 import discord
 from discord.cog import Cog
 from discord.ext.commands import Bot, when_mentioned_or
-from logging import Logger, getLogger, StreamHandler, DEBUG, BASIC_FORMAT, Formatter
-from lambo.config import Settings
 
+from lambo.config import Settings
 
 LOGGER_FORMAT = "[%(levelname)s][%(asctime)s][%(name)s]: %(message)s"
 

@@ -2,11 +2,11 @@ __version__ = "0.1.0"
 
 
 import asyncio
-from discord import ExtensionFailed, ExtensionNotFound
 
+import tortoise.exceptions
+from discord import ExtensionFailed, ExtensionNotFound
 from discord.ext.commands import errors
 from tortoise import Tortoise
-import tortoise.exceptions
 
 from lambo.config import Settings
 from lambo.custom_client import CustomClient
