@@ -6,6 +6,7 @@ from .activity_tracker import setup as activity_tracker_setup
 from .mention_channel import setup as mention_channel_setup
 from .ping_block import setup as ping_block_setup
 from .items_list import setup as items_list_setup
+from .color_management import setup as color_management_setup
 
 
 def setup(bot: CustomClient):
@@ -14,3 +15,4 @@ def setup(bot: CustomClient):
     ping_block_setup(bot)
     activity_tracker_setup(bot)
     items_list_setup(bot)
+    color_management_setup(bot)
