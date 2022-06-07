@@ -26,6 +26,7 @@ class ColorManagement(StrataCog, name="Color Management"):
     ):
         if not await self.is_color_owner(ctx.author, role):
             await ctx.reply("You're not the owner!")
+            return
         await role.edit(color=color)
         await ctx.reply("Color changed! :)")
 
