@@ -20,7 +20,7 @@ class ColorManagement(StrataCog, name="Color Management"):
     async def colors(self, ctx: Context):
         pass
 
-    @colors.command("hex")
+    @colors.command("hex", aliases=("set", "rgb"))
     async def colors_set_hex(
         self, ctx: Context, color: discord.Color, *, role: discord.Role
     ):
