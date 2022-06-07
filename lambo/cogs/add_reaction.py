@@ -3,7 +3,7 @@ import typing
 
 import discord
 import tortoise.transactions
-from discord.ext.commands import Cog, Context, command, group
+from discord.ext.commands import Cog, Context, command, group, is_owner
 
 from lambo import CustomClient
 from lambo.models import StickyMessageModel, AddReactionModel
@@ -15,6 +15,7 @@ class AddReactionCog(Cog, name="Add Reaction"):
     def __init__(self, bot: CustomClient) -> None:
         self.bot = bot
 
+    @is_owner()
     @group(name="addreaction", invoke_without_command=False)
     async def add_reaction(self, ctx: Context):
         pass

@@ -2,8 +2,9 @@ import typing
 
 import discord
 import tortoise.transactions
-from discord.ext.commands import Cog, Context, command, group
+from discord.ext.commands import Cog, Context, command, group, is_owner
 from discord.utils import escape_markdown
+
 from lambo import CustomClient
 from lambo.models import StickyMessageModel
 
@@ -14,6 +15,7 @@ class StickyMessageCog(Cog, name="Sticky Message"):
     def __init__(self, bot: CustomClient) -> None:
         self.bot = bot
 
+    @is_owner()
     @group(name="sticky", invoke_without_command=False)
     async def sticky(self, ctx: Context):
         pass
