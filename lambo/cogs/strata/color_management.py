@@ -88,7 +88,7 @@ class ColorManagement(StrataCog, name="Color Management"):
         for model in models:
             role = ctx.guild.get_role(int(model.role_id))
             owner = ctx.guild.get_member(int(model.owner_id))
-            strbuilder.append(f"{role}: {owner}")
+            strbuilder.append(f"{role} ({model.role_id}): {owner} ({model.owner_id})")
         await ctx.reply("\n".join(strbuilder))
 
     async def is_color_owner(
