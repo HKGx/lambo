@@ -9,3 +9,6 @@ from tortoise.models import Model
 class ColorRoleModel(Model):
     role_id = fields.CharField(max_length=22, pk=True, unique=True)  # role id
     owner_id = fields.CharField(max_length=22)  # owner id
+
+    class Meta:
+        unique_together = ("role_id", "owner_id")
