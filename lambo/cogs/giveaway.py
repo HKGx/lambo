@@ -58,7 +58,7 @@ class GiveawayCog(Cog, name="Template"):
         end_time: timedelta,
         winners: int,
         prize: str,
-        message: discord.Message,
+        message: Union[discord.Message, discord.TextChannel],
         author: Optional[Union[discord.Member, discord.User]] = None,
     ) -> Tuple[GiveawayModel, discord.Message]:
         ...
@@ -69,7 +69,7 @@ class GiveawayCog(Cog, name="Template"):
         end_time: datetime,
         winners: int,
         prize: str,
-        message: discord.Message,
+        message: Union[discord.Message, discord.TextChannel],
         author: Optional[Union[discord.Member, discord.User]] = None,
     ) -> Tuple[GiveawayModel, discord.Message]:
         ...
@@ -79,11 +79,15 @@ class GiveawayCog(Cog, name="Template"):
         end_time: Union[datetime, timedelta],
         winners: int,
         prize: str,
-        message: discord.Message,
+        message: Union[discord.Message, discord.TextChannel],
         author: Optional[Union[discord.Member, discord.User]] = None,
     ) -> Tuple[GiveawayModel, discord.Message]:
 
-        msg = await message.reply(content="Giveaway, add reactions to enter")
+        msg = await (
+            message.reply(content="Giveaway, add reactions to enter")
+            if isinstance(message, discord.Message)
+            else message.send(content="Giveaway, add reactions to enter")
+        )
         if isinstance(end_time, timedelta):
             end_time = datetime.utcnow() + end_time
         giveaway = await GiveawayModel.create(
@@ -99,19 +103,12 @@ class GiveawayCog(Cog, name="Template"):
         return (giveaway, msg)
 
     @staticmethod
-    async def end_giveaway(bot: CustomClient, giveaway: GiveawayModel) -> GiveawayModel:
-        giveaway.ended = True  # type: ignore
-        channel_id = int(giveaway.channel_id)
-        message_id = int(giveaway.message_id)
-        try:
-            channel = get_text_channel(bot, channel_id)
-            message = await channel.fetch_message(message_id)
-        except (ValueError, discord.NotFound, discord.Forbidden):
-            return giveaway
-
+    async def get_giveaway_winners(
+        message: discord.Message, giveaway: GiveawayModel
+    ) -> list[discord.User | discord.Member] | None:
         reaction = [reaction for reaction in message.reactions if reaction.emoji == "🎉"]
         if not reaction:
-            return giveaway
+            return None
 
         reacted_users = await reaction[0].users().flatten()
         reacted_members = [
@@ -122,10 +119,25 @@ class GiveawayCog(Cog, name="Template"):
 
         winner_count = min(giveaway.winners, len(reacted_members))
         if winner_count == 0:
-            await message.reply("No winners. 😿")
+            return []
+
+        return sample(reacted_members, winner_count)
+
+    @staticmethod
+    async def end_giveaway(bot: CustomClient, giveaway: GiveawayModel) -> GiveawayModel:
+        giveaway.ended = True  # type: ignore
+        channel_id = int(giveaway.channel_id)
+        message_id = int(giveaway.message_id)
+        try:
+            channel = get_text_channel(bot, channel_id)
+            message = await channel.fetch_message(message_id)
+        except (ValueError, discord.NotFound, discord.Forbidden):
             return giveaway
 
-        winners = sample(reacted_members, winner_count)
+        winners = await GiveawayCog.get_giveaway_winners(message, giveaway)
+        if not winners:
+            await message.reply(content="No one won the giveaway")
+            return giveaway
         winners_mentions = ", ".join(winner.mention for winner in winners)
         await message.reply(
             f"{winners_mentions} won the giveaway!",
@@ -196,6 +208,43 @@ class GiveawayCog(Cog, name="Template"):
             await ctx.reply("You are not the author of this giveaway")
             return
         await self.end_giveaway(self.bot, giveaway)
+
+    @command(name="freroll")
+    async def fake_reroll_cmd(
+        self, ctx: Context, message: Optional[discord.Message] = None
+    ) -> None:
+        if message is None:
+            if ctx.message.reference is None:
+                raise ValueError("No message provided")
+            message_id = ctx.message.reference.message_id
+        else:
+            message_id = message.id
+        giveaway = await GiveawayModel.get_or_none(message_id=message_id)
+        if giveaway is None:
+            await ctx.reply("No giveaway found for this message")
+            return
+        if not giveaway.ended:
+            await ctx.reply("This giveaway is still running")
+            return
+        channel = self.bot.get_channel(int(giveaway.channel_id))
+        if channel is None:
+            await ctx.reply("Channel not found")
+            return
+        message = await channel.fetch_message(int(giveaway.message_id))  # type: ignore
+        if message is None:
+            await ctx.reply("Message not found")
+            return
+        if message.reference is None:
+            await ctx.reply("Message is not a reply")
+            return
+        winners = await self.get_giveaway_winners(message, giveaway)
+        if winners is None:
+            await ctx.reply("No one won the giveaway")
+            return
+        winners_mentions = ", ".join(winner.mention for winner in winners)
+        await ctx.reply(
+            f"{winners_mentions} won the giveaway!",
+        )
 
 
 def setup(bot: CustomClient):
