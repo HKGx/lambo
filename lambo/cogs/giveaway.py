@@ -234,9 +234,6 @@ class GiveawayCog(Cog, name="Template"):
         if message is None:
             await ctx.reply("Message not found")
             return
-        if message.reference is None:
-            await ctx.reply("Message is not a reply")
-            return
         winners = await self.get_giveaway_winners(message, giveaway)
         if winners is None:
             await ctx.reply("No one won the giveaway")
