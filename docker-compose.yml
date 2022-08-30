@@ -1,6 +1,13 @@
 version: '3.4'
 
 services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/var/lib/postgresql/data
   lambo:
     image: lambo:old
     build:

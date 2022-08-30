@@ -1,12 +1,12 @@
 import json
-from math import ceil
 import typing
+from math import ceil
+
 import discord
 from discord.ext.commands import Context, check, group
-import tortoise.exceptions
 
-from lambo import CustomClient
 from lambo.cogs.strata.StrataCog import StrataCog
+from lambo.main import CustomClient
 from lambo.models.color_role_model import ColorRoleModel
 
 
@@ -35,16 +35,18 @@ class ColorManagement(StrataCog, name="Color Management"):
     async def colors_add_role(
         self, ctx: Context, user: discord.Member, *, role: discord.Role
     ):
-        try:
-            _, created = await ColorRoleModel.get_or_create(
-                {"owner_id": user.id, "role_id": role.id}
-            )
-            if created:
-                await ctx.reply(f"Added color {role}")
-            else:
-                await ctx.reply(f"Color {role} already exists!")
-        except tortoise.exceptions.IntegrityError:
-            await ctx.reply(f"Color {role} already exists and has a different owner!")
+        pass
+        # TODO: not use tortoise
+        # try:
+        #     _, created = await ColorRoleModel.get_or_create(
+        #         {"owner_id": user.id, "role_id": role.id}
+        #     )
+        #     if created:
+        #         await ctx.reply(f"Added color {role}")
+        #     else:
+        #         await ctx.reply(f"Color {role} already exists!")
+        # except tortoise.exceptions.IntegrityError:
+        #     await ctx.reply(f"Color {role} already exists and has a different owner!")
 
     @check(StrataCog.mod_only)
     @colors.command("remove")
@@ -98,5 +100,5 @@ class ColorManagement(StrataCog, name="Color Management"):
         return color is not None
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(ColorManagement(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(ColorManagement(bot))

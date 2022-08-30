@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord.ext.commands import BucketType, Cog, Context, command, cooldown
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.utils import get_text_channel
 
 
@@ -70,5 +70,5 @@ class ValentinesCog(Cog, name="Valentines"):
         await asyncio.gather(*actions)
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(ValentinesCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(ValentinesCog(bot))

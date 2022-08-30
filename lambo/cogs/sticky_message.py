@@ -1,11 +1,10 @@
 import typing
 
 import discord
-import tortoise.transactions
 from discord.ext.commands import Cog, Context, command, group, is_owner
 from discord.utils import escape_markdown
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.models import StickyMessageModel
 
 
@@ -21,7 +20,6 @@ class StickyMessageCog(Cog, name="Sticky Message"):
         pass
 
     @sticky.command("set")
-    @tortoise.transactions.atomic()
     async def sticky_set_message(
         self,
         ctx: Context,
@@ -47,7 +45,6 @@ class StickyMessageCog(Cog, name="Sticky Message"):
         return await msg.save(update_fields=("bot_last_message_id",))
 
     @sticky.command("remove")
-    @tortoise.transactions.atomic()
     async def sticky_remove_message(self, ctx: Context, channel: discord.TextChannel):
         sticky_message = await StickyMessageModel.get_or_none(channel_id=channel.id)
         if sticky_message is None:
@@ -62,7 +59,6 @@ class StickyMessageCog(Cog, name="Sticky Message"):
             pass
 
     @Cog.listener("on_message")
-    @tortoise.transactions.atomic()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
@@ -82,5 +78,5 @@ class StickyMessageCog(Cog, name="Sticky Message"):
         return await msg.save(update_fields=("bot_last_message_id",))
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(StickyMessageCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(StickyMessageCog(bot))

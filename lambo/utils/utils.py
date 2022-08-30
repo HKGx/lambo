@@ -4,7 +4,8 @@ from datetime import date, datetime, timedelta
 
 import discord
 from discord import Guild, Role
-from discord.ext.commands import Context, Converter, RoleConverter, RoleNotFound
+from discord.ext.commands import (Context, Converter, RoleConverter,
+                                  RoleNotFound)
 
 from lambo.custom_client import CustomClient
 
@@ -19,9 +20,7 @@ class FuzzyRoleConverter(RoleConverter):
             if guild == None:
                 raise e
             matching_roles = [
-                role
-                for role in guild._roles.values()
-                if argument.lower() in role.name.lower()
+                role for role in guild.roles if argument.lower() in role.name.lower()
             ]
             if len(matching_roles) == 0:
                 raise e

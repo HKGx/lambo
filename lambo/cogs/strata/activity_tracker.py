@@ -1,27 +1,27 @@
 import asyncio
+import json
 from datetime import date, timedelta
-from typing import Optional
+from io import BytesIO
+from typing import BinaryIO, Optional, TextIO
 
 import discord
-from discord.ext.commands import Cog, Context, command
+from discord.ext.commands import Cog, Context, check, command, group
 
-from lambo import CustomClient
 from lambo.cogs.giveaway import GiveawayCog
+from lambo.cogs.strata.StrataCog import StrataCog
+from lambo.main import CustomClient
 from lambo.models.activity_tracker_model import StageModel
 from lambo.models.strata_models import ActivityTrackerModel
 from lambo.utils.utils import TimedeltaConverter
 
 
-class ActivityTracker(Cog, name="Activity Tracker"):
-    ALLOWED_GUILD_IDS = [211261411119202305, 950868480041824266]
+class ActivityTracker(StrataCog, name="Activity Tracker"):
     ALLOWED_CHANNELS = [
         412146574823784468,  # rozmowy⭐
         533671424896925737,  # pogaduchy
         683025889658929231,  # rozmowy_dla_nowych⭐
         951215423741907005,  # baranek_test
     ]
-    MODERATOR_ROLE_IDS = [303943612784181248, 950873817193000991]
-
     bot: CustomClient
 
     def __init__(self, bot: CustomClient) -> None:
@@ -64,12 +64,18 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             *[self.handle_stage(stage, message.channel) for stage in stages]
         )
 
-    @command(name="list_stages")
+    @group("activitytracker", aliases=("activity", "at"), invoke_without_command=False)
+    async def activity_tracker(self, ctx: Context):
+        pass
+
+    @activity_tracker.group(name="stage", aliases=("s",), invoke_without_command=False)
+    async def activity_tracker_stage(self, ctx: Context):
+        pass
+
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="list", aliases=("ls",))
     async def get_stages(self, ctx: Context) -> None:
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         stages = await StageModel.all().limit(10)
         stage_text = []
         for stage in stages:
@@ -83,14 +89,36 @@ class ActivityTracker(Cog, name="Activity Tracker"):
                 )
         await ctx.send("\n".join(stage_text))
 
-    @command(name="add_stage")
-    async def add_stage(
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="export", aliases=("e",))
+    async def export_stages(self, ctx: Context):
+        assert isinstance(ctx.author, discord.Member)
+        stages = await StageModel.all()
+        s = json.dumps([stage.to_dict() for stage in stages], indent=2)
+        await ctx.reply(file=discord.File(BytesIO(s.encode("utf-8")), "stages.json"))
+
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="import", aliases=("i",))
+    async def import_stages(self, ctx: Context):
+        assert isinstance(ctx.author, discord.Member)
+        await self.activity_tracker_drop(ctx)
+        stages = await StageModel.all()
+        s = json.dumps([stage.to_dict() for stage in stages], indent=2)
+        await ctx.reply(file=discord.File(BytesIO(s.encode("utf-8")), "stages.json"))
+
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="dropall")
+    async def activity_tracker_drop(self, ctx: Context) -> None:
+        assert isinstance(ctx.author, discord.Member)
+        await ActivityTrackerModel.select_for_update().delete()
+        await ctx.send("Dropped all activity tracker data.")
+
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.group(name="add", aliases=("a",))
+    async def activity_tracker_stage_add(
         self, ctx: Context, messages_needed: int, *, response_message: str
     ) -> None:
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         stage = StageModel.basic_stage(
             messages_needed=messages_needed,
             response_message=response_message,
@@ -100,7 +128,8 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             f"Added stage {stage.idx} :: {messages_needed} :: {response_message}"
         )
 
-    @command(name="add_gstage")
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage_add.command(name="giveaway", aliases=("g",))
     async def add_giveaway_stage(
         self,
         ctx: Context,
@@ -111,9 +140,6 @@ class ActivityTracker(Cog, name="Activity Tracker"):
         prize: str,
     ) -> None:
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         time: timedelta = time_  # type: ignore
         stage = StageModel.giveaway_stage(messages_needed, prize, winners, time)
         await stage.save()
@@ -121,18 +147,17 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             f"Added giveaway stage  {stage.idx} :: {messages_needed} :: {prize} for {winners} winners"
         )
 
-    @command(name="default_stage")
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="default")
     async def set_default_stage(
         self, ctx: Context, idx: int, default: bool = True
     ) -> None:
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         await StageModel.filter(idx=idx).update(default=default)
         await ctx.send(f"Added default stage :: {idx}")
 
-    @command(name="stage_enable")
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command(name="enable")
     async def set_stage_enabled(
         self,
         ctx: Context,
@@ -143,14 +168,9 @@ class ActivityTracker(Cog, name="Activity Tracker"):
         if channel is None:
             channel = ctx.channel  # type: ignore
         assert channel is not None
-        if channel.guild.id not in self.ALLOWED_GUILD_IDS:
-            return
         if channel.id not in self.ALLOWED_CHANNELS:
             return
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         # copy paste
         today = date.today()
         model, created = await ActivityTrackerModel.get_or_create(
@@ -171,21 +191,17 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             f"Stage {stage_index} is now {'enabled' if enable else 'disabled'} for channel {channel}"
         )
 
-    @command(name="messages_in")
+    @check(StrataCog.mod_only)
+    @activity_tracker.command(name="messages_in")
     async def get_messages_in(
         self, ctx: Context, channel: Optional[discord.TextChannel] = None
     ):
         if channel is None:
             channel = ctx.channel  # type: ignore
         assert channel is not None
-        if channel.guild.id not in self.ALLOWED_GUILD_IDS:
-            return
         if channel.id not in self.ALLOWED_CHANNELS:
             return
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         today = date.today()
         today = date.today()
         model, created = await ActivityTrackerModel.get_or_create(
@@ -196,15 +212,13 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             await model.stages.add(*default_stages)
         await ctx.reply(f"{model.messages_sent} messages sent in {channel}")
 
-    @command("remove_stage")
+    @check(StrataCog.mod_only)
+    @activity_tracker_stage.command("remove", aliases=("r",))
     async def remove_stage(self, ctx: Context, idx: int):
         assert isinstance(ctx.author, discord.Member)
-        role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
-        if not role:
-            return
         model = await StageModel.get(idx=idx)
         await model.delete()
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(ActivityTracker(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(ActivityTracker(bot))

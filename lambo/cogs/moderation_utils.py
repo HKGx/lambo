@@ -3,9 +3,10 @@ import typing
 from io import StringIO
 
 import discord
-from discord.ext.commands import Cog, Context, FlagConverter, group, has_permissions
+from discord.ext.commands import (Cog, Context, FlagConverter, group,
+                                  has_permissions)
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.utils import FuzzyRoleConverter
 
 
@@ -21,7 +22,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         self.bot = bot
 
     @group(name="role", invoke_without_command=False)
-    async def role(self, ctx: Context):
+    async def role(self, ctx: Context[CustomClient]):
         pass
 
     @role.command(name="overlap")
@@ -65,7 +66,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
             await ctx.reply(f"Moved role {role.name} with id {role.id}")
 
     @role.command(name="fuse")
-    @has_permissions(manage_roles=True)
+    @has_permissions(administrator=True)
     async def fuse_roles(
         self, ctx: Context, from_role: discord.Role, to_role: discord.Role
     ):
@@ -76,15 +77,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
             await ctx.reply("Cannot fuse a role with itself")
         author: typing.Union[discord.Member, discord.User] = ctx.author  # type: ignore
         assert isinstance(author, discord.Member), "author is not a member"
-        if (
-            len(from_role.members) > 100
-            and len(to_role.members) > 100
-            and not await self.bot.is_owner(author._user)
-        ):
-            await ctx.reply(
-                "Cannot fuse more than 100 members unless you're the bot owner"
-            )
-            return
+
         msg = await ctx.reply(f"Fusing {from_role.name} and {to_role.name}")
         async with ctx.typing():
             members: StringIO = StringIO()
@@ -200,5 +193,5 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         )
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(ModerationUtilsCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(ModerationUtilsCog(bot))

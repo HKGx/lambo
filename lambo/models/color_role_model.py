@@ -2,8 +2,6 @@ from datetime import timedelta
 from enum import IntEnum
 from typing import Optional, TypedDict
 
-from tortoise import fields
-from tortoise.models import Model
 
 
 class ColorRoleModel(Model):

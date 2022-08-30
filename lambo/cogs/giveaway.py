@@ -4,12 +4,12 @@ from random import sample
 from typing import Optional, Tuple, Union, overload
 
 import discord
-from discord.embeds import EmptyEmbed
+from discord.embeds import Embed
 from discord.ext.commands import Cog, Context, command
 from discord.ext.tasks import loop
 from discord.utils import format_dt
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.models import giveway_model
 from lambo.models.giveway_model import GiveawayModel
 from lambo.utils.utils import TimedeltaConverter, get_text_channel
@@ -42,8 +42,8 @@ class GiveawayCog(Cog, name="Template"):
         giveaway: GiveawayModel,
         author: Optional[Union[discord.Member, discord.User]] = None,
     ) -> discord.Embed:
-        author_name = str(author) if author else EmptyEmbed
-        author_icon = author.display_avatar.url if author else EmptyEmbed
+        author_name = str(author) if author else Embed()
+        author_icon = author.display_avatar.url if author else Embed()
         return (
             discord.Embed(title="Giveaway", color=0x00FF00)
             .set_footer(text=author_name, icon_url=author_icon)
@@ -113,7 +113,7 @@ class GiveawayCog(Cog, name="Template"):
         if not reaction:
             return giveaway
 
-        reacted_users = await reaction[0].users().flatten()
+        reacted_users = [user async for user in reaction[0].users()]
         reacted_members = [
             user
             for user in reacted_users
@@ -159,5 +159,5 @@ class GiveawayCog(Cog, name="Template"):
         await self.create_giveaway(end_time, winners, message, channel, author)
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(GiveawayCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(GiveawayCog(bot))

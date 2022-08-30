@@ -1,8 +1,18 @@
-.env
-__pycache__/
-.vscode
-.idea
-/data
-db.sqlite3*
-lambo/cogs/wip*/
+# editor-specific configuration
+.vscode/
+.idea/
 
+# obviously. 
+.env 
+
+# python generated files
+__pycache__/
+
+# postgres generated files
+/data
+
+# files that are still wip
+lambo/cogs/wip*
+
+# overrides for development
+docker-compose.override.yml

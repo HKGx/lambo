@@ -5,7 +5,7 @@ import discord
 from discord.ext.commands import Cog, Context, command
 from discord.utils import escape_markdown, format_dt
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.utils import get_guild, get_role
 from lambo.utils.caches import TTLCache
 
@@ -47,7 +47,7 @@ class RolePingBlockCog(Cog, name="Role Ping Blocking"):
         if message.author.id in self.cache:
             if isinstance(message.author, discord.Member):
                 try:
-                    await message.author.timeout_for(
+                    await message.author.timeout(
                         self.TIMEOUT_TIME, reason="Role ping block"
                     )
                     await message.channel.send(
@@ -85,5 +85,5 @@ class RolePingBlockCog(Cog, name="Role Ping Blocking"):
             await ctx.reply("Nie masz cooldownu.")
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(RolePingBlockCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(RolePingBlockCog(bot))

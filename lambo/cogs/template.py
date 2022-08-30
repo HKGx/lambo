@@ -2,7 +2,7 @@ import discord
 from discord.ext.commands import Cog, Context, command
 from discord.utils import escape_markdown
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 
 
 class TemplateCog(Cog, name="Template"):
@@ -12,5 +12,5 @@ class TemplateCog(Cog, name="Template"):
         self.bot = bot
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(TemplateCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(TemplateCog(bot))

@@ -5,18 +5,20 @@ description = ""
 authors = ["HKGx <19597269+HKGx@users.noreply.github.com>"]
 
 [tool.poetry.scripts]
-lambo = 'lambo:main'
+lambo = 'lambo.main:main'
+migrate = "lambo.migrations:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-py-cord = {git = "https://github.com/Pycord-Development/pycord.git"}
-pydantic = {extras = ["dotenv"], version = "^1.8.2"}
-tortoise-orm = {extras = ["aiosqlite"], version = "^0.18.1"}
+pydantic = { extras = ["dotenv"], version = "^1.9.2" }
+'discord.py' = { git = "https://github.com/Rapptz/discord.py.git" }
+psycopg = { extras = ["binary"], version = "^3.0.16" }
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-autopep8 = "^1.6.0"
-black = {version = "^22.3.0", allow-prereleases = true}
+pytest = "^7.1.2"
+autopep8 = "^1.7.0"
+black = "^22.6.0"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

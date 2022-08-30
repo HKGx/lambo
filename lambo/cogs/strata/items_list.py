@@ -2,7 +2,7 @@ import discord
 from discord.ext.commands import Cog, Context, command
 from discord.utils import escape_markdown
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 
 
 class ItemsListCog(Cog, name="Items List"):
@@ -57,5 +57,5 @@ class ItemsListCog(Cog, name="Items List"):
             await ctx.send(f"`{item_id}` – {item_name}")
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(ItemsListCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(ItemsListCog(bot))

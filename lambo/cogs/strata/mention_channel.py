@@ -3,7 +3,7 @@ import re
 import discord
 from discord.ext.commands import Cog
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.utils import get_guild
 
 
@@ -46,5 +46,5 @@ class MentionChannelCog(Cog, name="Channel Mentioning"):
         )
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(MentionChannelCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(MentionChannelCog(bot))

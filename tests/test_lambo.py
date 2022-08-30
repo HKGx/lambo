@@ -1,4 +1,4 @@
-from lambo import __version__
+from lambo.main import __version__
 
 
 def test_version():

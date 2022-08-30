@@ -1,8 +1,7 @@
 from datetime import timedelta
 from enum import IntEnum
+from typing import Optional, TypedDict
 
-from tortoise import fields
-from tortoise.models import Model
 
 
 class ActivityTrackerModel(Model):
@@ -20,6 +19,17 @@ class ActivityTrackerModel(Model):
 class StageType(IntEnum):
     BASIC_STAGE = 1
     GIVEAWAY = 2
+
+
+class StageJson(TypedDict):
+    idx: int
+    stage_type: int
+    messages_needed: int
+    response_message: str
+    default: bool
+
+    winners: Optional[int]
+    giveaway_time: Optional[int]
 
 
 class StageModel(Model):
@@ -65,4 +75,15 @@ class StageModel(Model):
             stage_type=StageType.BASIC_STAGE,
             messages_needed=messages_needed,
             response_message=response_message,
+        )
+
+    def to_dict(self) -> StageJson:
+        return StageJson(
+            idx=self.idx,
+            stage_type=int(self.stage_type),
+            messages_needed=self.messages_needed,
+            response_message=self.response_message,
+            default=bool(self.default),
+            winners=self.winners,
+            giveaway_time=self.giveaway_time.seconds if self.giveaway_time else None,
         )

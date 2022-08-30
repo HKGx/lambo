@@ -1,7 +1,3 @@
-from tortoise import fields
-from tortoise.models import Model
-
-
 class UsedEmojiModel(Model):
     emoji = fields.CharField(max_length=64, index=True)
     timestamp = fields.DatetimeField(auto_now_add=True)

@@ -1,17 +1,8 @@
 from collections import namedtuple
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import (
-    Generic,
-    ItemsView,
-    Iterable,
-    Iterator,
-    KeysView,
-    MutableMapping,
-    NamedTuple,
-    TypeVar,
-    Union,
-)
+from typing import (Generic, ItemsView, Iterable, Iterator, KeysView,
+                    MutableMapping, NamedTuple, TypeVar, Union)
 
 K = TypeVar("K")
 V = TypeVar("V")

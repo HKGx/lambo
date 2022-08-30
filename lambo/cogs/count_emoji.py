@@ -2,11 +2,11 @@ import typing
 from datetime import datetime
 
 import discord
-from discord.ext.commands import Cog, Context, FlagConverter, flag, group, is_owner
+from discord.ext.commands import (Cog, Context, FlagConverter, flag, group,
+                                  is_owner)
 from discord.utils import DISCORD_EPOCH
-from tortoise.functions import Count
 
-from lambo import CustomClient
+from lambo.main import CustomClient
 from lambo.models.used_emoji_model import UsedEmojiModel
 from lambo.utils import DateConverter
 
@@ -228,5 +228,5 @@ class CountEmojiCog(Cog, name="Emoji Counting"):
         await ctx.send(f"Done. Last message: {last.jump_url}")
 
 
-def setup(bot: CustomClient):
-    bot.add_cog(CountEmojiCog(bot))
+async def setup(bot: CustomClient):
+    await bot.add_cog(CountEmojiCog(bot))
