@@ -19,6 +19,10 @@ class InroleFlags(FlagConverter):
     page: int = flag(name="page", default=1)
 
 
+class ReactedFlags(FlagConverter):
+    mentions: bool = flag(name="mentions", aliases=["mention"], default=False)
+    hide_names: bool = flag(name="hide_names", aliases=["hide"], default=False)
+
 class UtilitiesCog(Cog, name="Utilities"):
     bot: CustomClient
 
@@ -106,6 +110,8 @@ class UtilitiesCog(Cog, name="Utilities"):
         ctx: Context,
         message: discord.Message,
         role: typing.Optional[discord.Role],
+        *,
+        flags: ReactedFlags,
     ):
         assert ctx.guild is not None
         assert isinstance(message.channel, discord.abc.GuildChannel)
@@ -129,15 +135,22 @@ class UtilitiesCog(Cog, name="Utilities"):
             reactions_dict[emoji_name] = users
         not_reacted = set(members) - reacted_users
 
+        def format_user(user: discord.Member) -> str:
+            if flags.mentions and flags.hide_names:
+                return user.mention
+            elif flags.mentions:
+                return f"{user.mention} ({user})"
+            return str(user)
+
         buffer = ""
 
         for emoji, users in reactions_dict.items():
             buffer += f"{emoji}: {len(users)}\n"
             for user in users:
-                buffer += f"\t{user}\n"
+                buffer += f"\t{format_user(user)}\n"
         buffer += f"\nNot reacted: {len(not_reacted)}\n"
         for user in not_reacted:
-            buffer += f"\t{user}\n"
+            buffer += f"\t{format_user(user)}\n"
 
         await ctx.reply(
             file=discord.File(BytesIO(buffer.encode("utf-8")), filename="reacted.txt")
