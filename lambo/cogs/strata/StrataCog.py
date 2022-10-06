@@ -1,10 +1,23 @@
 import discord
 from discord.ext.commands import Cog, Context
+from lambo import CustomClient
 
 
 class StrataCog(Cog):
+    bot: CustomClient
+
     ALLOWED_GUILD_IDS = [211261411119202305, 950868480041824266]
     MODERATOR_ROLE_IDS = [303943612784181248, 950873817193000991]
+    CARETAKER_ROLES = [
+        *MODERATOR_ROLE_IDS,
+        422408722107596811,
+        412193755286732800,
+        303943612784181248,
+    ]
+
+    def __init__(self, bot: CustomClient) -> None:
+        super().__init__()
+        self.bot = bot
 
     def cog_check(self, ctx: Context) -> bool:
         if ctx.guild is None:
@@ -14,10 +27,21 @@ class StrataCog(Cog):
         return True
 
     @staticmethod
-    def mod_only(ctx: Context) -> bool:
+    async def mod_only(ctx: Context) -> bool:
         if ctx.guild is None:
             return False
         assert isinstance(ctx.author, discord.Member)
-        return any(
-            role for role in ctx.author.roles if role.id in StrataCog.MODERATOR_ROLE_IDS
-        )
+        assert isinstance(ctx.bot, discord.Bot)
+        if await ctx.bot.is_owner(ctx.author):  # type: ignore
+            return True
+        return any(role.id in StrataCog.MODERATOR_ROLE_IDS for role in ctx.author.roles)
+
+    @staticmethod
+    async def caretakers_only(ctx: Context) -> bool:
+        if ctx.guild is None:
+            return False
+        assert isinstance(ctx.author, discord.Member)
+        assert isinstance(ctx.bot, discord.Bot)
+        if await ctx.bot.is_owner(ctx.author):  # type: ignore
+            return True
+        return any(role.id in StrataCog.CARETAKER_ROLES for role in ctx.author.roles)

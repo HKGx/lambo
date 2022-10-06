@@ -43,7 +43,7 @@ class CustomClient(Bot):
         allowed_mentions.replied_user = True
 
         super().__init__(
-            command_prefix=when_mentioned_or(prefix),
+            command_prefix=when_mentioned_or(prefix), # type: ignore
             intents=intents,
             allowed_mentions=allowed_mentions,
             **kwargs,
@@ -64,7 +64,7 @@ class CustomClient(Bot):
             self.logger.info(f"Removed cog `{value.qualified_name}`")
         return value
 
-    def load_extension(self, name: str, *, package: Optional[str] = None) -> None:
+    def load_extension(self, name: str, *, package: Optional[str] = None) -> list[str]:
         self.logger.info(f"Loading extension `{name}`")
         return super().load_extension(name, package=package)
 

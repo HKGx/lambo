@@ -23,6 +23,7 @@ class ReactedFlags(FlagConverter):
     mentions: bool = flag(name="mentions", aliases=["mention"], default=False)
     hide_names: bool = flag(name="hide_names", aliases=["hide"], default=False)
 
+
 class UtilitiesCog(Cog, name="Utilities"):
     bot: CustomClient
 
