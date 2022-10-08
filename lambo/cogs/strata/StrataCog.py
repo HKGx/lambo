@@ -1,6 +1,8 @@
 import discord
 from discord.ext.commands import Cog, Context
+
 from lambo import CustomClient
+from lambo.utils import is_member
 
 
 class StrataCog(Cog):
@@ -30,7 +32,7 @@ class StrataCog(Cog):
     async def mod_only(ctx: Context) -> bool:
         if ctx.guild is None:
             return False
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         assert isinstance(ctx.bot, discord.Bot)
         if await ctx.bot.is_owner(ctx.author):  # type: ignore
             return True
@@ -40,7 +42,7 @@ class StrataCog(Cog):
     async def caretakers_only(ctx: Context) -> bool:
         if ctx.guild is None:
             return False
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         assert isinstance(ctx.bot, discord.Bot)
         if await ctx.bot.is_owner(ctx.author):  # type: ignore
             return True

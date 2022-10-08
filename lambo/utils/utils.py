@@ -73,6 +73,10 @@ class TimedeltaConverter(Converter[timedelta]):
         )
 
 
+def is_member(user: discord.User | discord.Member) -> typing.TypeGuard[discord.Member]:
+    return isinstance(user, discord.Member)
+
+
 def get_text_channel(bot: CustomClient, channel_id: int) -> discord.TextChannel:
     channel = bot.get_channel(channel_id)
     if not channel:

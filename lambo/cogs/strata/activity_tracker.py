@@ -9,7 +9,7 @@ from lambo import CustomClient
 from lambo.cogs.giveaway import GiveawayCog
 from lambo.models.activity_tracker_model import StageModel
 from lambo.models.strata_models import ActivityTrackerModel
-from lambo.utils.utils import TimedeltaConverter
+from lambo.utils import TimedeltaConverter, is_member
 
 
 class ActivityTracker(Cog, name="Activity Tracker"):
@@ -66,7 +66,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
 
     @command(name="list_stages")
     async def get_stages(self, ctx: Context) -> None:
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -87,7 +87,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
     async def add_stage(
         self, ctx: Context, messages_needed: int, *, response_message: str
     ) -> None:
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -110,7 +110,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
         *,
         prize: str,
     ) -> None:
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -125,7 +125,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
     async def set_default_stage(
         self, ctx: Context, idx: int, default: bool = True
     ) -> None:
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -147,7 +147,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             return
         if channel.id not in self.ALLOWED_CHANNELS:
             return
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -182,7 +182,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
             return
         if channel.id not in self.ALLOWED_CHANNELS:
             return
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return
@@ -198,7 +198,7 @@ class ActivityTracker(Cog, name="Activity Tracker"):
 
     @command("remove_stage")
     async def remove_stage(self, ctx: Context, idx: int):
-        assert isinstance(ctx.author, discord.Member)
+        assert is_member(ctx.author)
         role = [role for role in ctx.author.roles if role.id in self.MODERATOR_ROLE_IDS]
         if not role:
             return

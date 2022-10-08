@@ -43,7 +43,7 @@ class CustomClient(Bot):
         allowed_mentions.replied_user = True
 
         super().__init__(
-            command_prefix=when_mentioned_or(prefix), # type: ignore
+            command_prefix=when_mentioned_or(prefix),  # type: ignore
             intents=intents,
             allowed_mentions=allowed_mentions,
             **kwargs,

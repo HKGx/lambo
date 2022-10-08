@@ -10,9 +10,8 @@ from discord.ext.tasks import loop
 from discord.utils import format_dt
 
 from lambo import CustomClient
-from lambo.models import giveway_model
 from lambo.models.giveway_model import GiveawayModel
-from lambo.utils.utils import TimedeltaConverter, get_text_channel
+from lambo.utils import TimedeltaConverter, get_text_channel
 
 
 class GiveawayCog(Cog, name="Template"):

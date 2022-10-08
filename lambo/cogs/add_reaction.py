@@ -6,7 +6,7 @@ import tortoise.transactions
 from discord.ext.commands import Cog, Context, command, group, is_owner
 
 from lambo import CustomClient
-from lambo.models import StickyMessageModel, AddReactionModel
+from lambo.models import AddReactionModel, StickyMessageModel
 
 
 class AddReactionCog(Cog, name="Add Reaction"):

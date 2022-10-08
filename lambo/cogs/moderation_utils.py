@@ -6,7 +6,7 @@ import discord
 from discord.ext.commands import Cog, Context, FlagConverter, group, has_permissions
 
 from lambo import CustomClient
-from lambo.utils import FuzzyRoleConverter
+from lambo.utils import FuzzyRoleConverter, is_member
 
 
 class PermissionsFor(FlagConverter):
@@ -74,12 +74,11 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         """
         if from_role == to_role:
             await ctx.reply("Cannot fuse a role with itself")
-        author: typing.Union[discord.Member, discord.User] = ctx.author  # type: ignore
-        assert isinstance(author, discord.Member), "author is not a member"
+        assert is_member(ctx.author)
         if (
             len(from_role.members) > 100
             and len(to_role.members) > 100
-            and not await self.bot.is_owner(author._user)
+            and not await self.bot.is_owner(ctx.author)  # type: ignore
         ):
             await ctx.reply(
                 "Cannot fuse more than 100 members unless you're the bot owner"
@@ -145,9 +144,7 @@ class ModerationUtilsCog(Cog, name="Moderation Utilities"):
         *,
         permissions: PermissionsFor,
     ):
-        assert isinstance(
-            ctx.author, discord.Member
-        ), "ctx.author is not a discord.Member"
+        assert is_member(ctx.author)
         if not channel.permissions_for(ctx.author).manage_permissions:
             await ctx.send(
                 "You do not have permission to manage permissions for this channel."

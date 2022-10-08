@@ -1,9 +1,10 @@
 import json
-from math import ceil
 import typing
+from math import ceil
+
 import discord
-from discord.ext.commands import Context, check, group
 import tortoise.exceptions
+from discord.ext.commands import Context, check, group
 
 from lambo import CustomClient
 from lambo.cogs.strata.StrataCog import StrataCog

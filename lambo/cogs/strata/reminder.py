@@ -1,11 +1,13 @@
 import asyncio
-from email import message
-from logging import exception
-from typing import Any, Coroutine, Union
+from typing import Any, Coroutine, Union, cast
+
 import discord
-from .StrataCog import StrataCog
-from discord.ext.commands import Cog, Context, group, check, command
+from discord.ext.commands import Context, check, command
+
 from lambo import CustomClient
+from lambo.utils import is_member
+
+from .StrataCog import StrataCog
 
 
 class ReminderCog(StrataCog, name="Reminder"):
@@ -32,7 +34,10 @@ class ReminderCog(StrataCog, name="Reminder"):
         )
         async with ctx.typing():
             tasks: list[Coroutine[Any, Any, discord.Message]] = []
-            users = await reaction.users().flatten()
+            users = cast(
+                list[discord.Member],
+                (await reaction.users().filter(is_member).flatten()),
+            )
             for user in users:
                 if user.bot:
                     continue
