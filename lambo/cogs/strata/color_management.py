@@ -7,7 +7,7 @@ import tortoise.exceptions
 from discord.ext.commands import Context, check, group
 
 from lambo import CustomClient
-from lambo.cogs.strata.StrataCog import StrataCog
+from lambo.cogs.strata.strata_cog import StrataCog
 from lambo.models.color_role_model import ColorRoleModel
 
 

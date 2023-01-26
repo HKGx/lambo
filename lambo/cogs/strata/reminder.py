@@ -7,7 +7,7 @@ from discord.ext.commands import Context, check, command
 from lambo import CustomClient
 from lambo.utils import is_member
 
-from .StrataCog import StrataCog
+from .strata_cog import StrataCog
 
 
 class ReminderCog(StrataCog, name="Reminder"):
