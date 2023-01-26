@@ -1,4 +1,3 @@
-from logging import BASIC_FORMAT, DEBUG, Formatter, Logger, StreamHandler, getLogger
 from typing import Optional
 
 import discord
@@ -12,14 +11,9 @@ LOGGER_FORMAT = "[%(levelname)s][%(asctime)s][%(name)s]: %(message)s"
 
 class CustomClient(Bot):
     _settings: Settings
-    _logger: Logger = getLogger("lambo")
 
-    @property
-    def logger(self) -> Logger:
-        return self._logger
 
     def __init__(self, settings: Settings, *args, **kwargs):
-
         prefix = settings.prefix
         raw_intents = settings.intents
         intents = discord.Intents.none()
@@ -34,10 +28,6 @@ class CustomClient(Bot):
                 setattr(intents, intent, True)
 
         self._settings = settings
-        self.logger.setLevel(DEBUG)
-        handler = StreamHandler()
-        handler.setFormatter(Formatter(LOGGER_FORMAT))
-        self.logger.addHandler(handler)
 
         allowed_mentions = discord.AllowedMentions.none()
         allowed_mentions.replied_user = True
@@ -55,29 +45,23 @@ class CustomClient(Bot):
         return await super().start(self._settings.token)
 
     def add_cog(self, cog: Cog, *, override: bool = False) -> None:
-        self.logger.info(f"Adding cog `{cog.qualified_name}`")
         return super().add_cog(cog, override=override)
 
     def remove_cog(self, name: str) -> Optional[Cog]:
         value = super().remove_cog(name)
-        if value is not None:
-            self.logger.info(f"Removed cog `{value.qualified_name}`")
         return value
 
     def load_extension(self, name: str, *, package: Optional[str] = None) -> list[str]:
-        self.logger.info(f"Loading extension `{name}`")
-        return super().load_extension(name, package=package)
+        try:
+            return super().load_extension(name, package=package)
+        except discord.ExtensionFailed as e:
+            raise e.original
 
     def unload_extension(self, name: str, *, package: Optional[str] = None) -> None:
-        self.logger.info(f"Unloading extension `{name}`")
         return super().unload_extension(name, package=package)
 
     def reload_extension(self, name: str, *, package: Optional[str] = None) -> None:
-        self.logger.info(f"Reloading extension `{name}`")
         return super().reload_extension(name, package=package)
 
     def run(self):
         return super().run(self._settings.token)
-
-    async def on_ready(self):
-        self.logger.info(f"Logged in as {self.user} with intents {self.intents}")
