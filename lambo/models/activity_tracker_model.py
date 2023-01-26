@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta, date
+from datetime import date as datetime_date, timedelta
 from enum import IntEnum
-from typing import Protocol, TypeGuard, TypedDict
+from typing import Protocol, TypedDict, TypeGuard
 
 from tortoise import fields
 from tortoise.models import Model
@@ -8,7 +8,7 @@ from tortoise.models import Model
 
 class ActivityTrackerModel(Model):
     channel_id: str = fields.CharField(max_length=22)  # channel id
-    date: date = fields.DateField()
+    date: datetime_date = fields.DateField()
     messages_sent: int = fields.IntField(default=0)
     stages: fields.ManyToManyRelation["StageModel"] = fields.ManyToManyField(
         "lambo.StageModel", related_name="collection"

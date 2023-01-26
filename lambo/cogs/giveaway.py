@@ -81,7 +81,6 @@ class GiveawayCog(Cog, name="Template"):
         message: Union[discord.Message, discord.TextChannel],
         author: Optional[Union[discord.Member, discord.User]] = None,
     ) -> Tuple[GiveawayModel, discord.Message]:
-
         msg = await (
             message.reply(content="Giveaway, add reactions to enter")
             if isinstance(message, discord.Message)

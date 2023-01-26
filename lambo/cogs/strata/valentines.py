@@ -8,7 +8,6 @@ from lambo.utils import get_text_channel
 
 
 class ValentinesCog(Cog, name="Valentines"):
-
     VALENTINES_CHANNEL_ID = 941365482731216936
     ANNOUNCEMENT_CHANNEL_ID = 412146574823784468
     SPAM_CHANNEL_ID = 412151174641221632

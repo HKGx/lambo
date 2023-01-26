@@ -52,7 +52,6 @@ class DateConverter(Converter[date]):
 
 
 class TimedeltaConverter(Converter[timedelta]):
-
     REGEX = re.compile(
         r"((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?"
     )
