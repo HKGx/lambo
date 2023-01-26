@@ -39,7 +39,7 @@ def main():
         ExtensionFailed,
         tortoise.exceptions.ConfigurationError,
     ) as e:
-        print(f"{e}")
+        print(e)
         loop.run_until_complete(Tortoise.close_connections())
         loop.run_until_complete(bot.close())
     finally:
