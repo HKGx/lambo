@@ -1,3 +1,6 @@
+[tool.isort]
+profile = "black"
+
 [tool.poetry]
 name = "lambo"
 version = "0.1.0"
@@ -9,15 +12,15 @@ lambo = 'lambo:main'
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = { extras = ["dotenv"], version = "^1.8.2" }
-tortoise-orm = { extras = ["aiosqlite"], version = "^0.18.1" }
-py-cord = "^2.2.2"
+pydantic = {extras = ["dotenv"], version = "^1.10.4"}
+tortoise-orm = "^0.19.2"
+py-cord = "^2.3.2"
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.10.1"
-pytest = "^5.2"
-autopep8 = "^1.6.0"
-black = { version = "^22.3.0", allow-prereleases = true }
+isort = "^5.11.4"
+pytest = "^7.2.1"
+autopep8 = "^2.0.1"
+black = { version = "^23.1a1", allow-prereleases = true }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
