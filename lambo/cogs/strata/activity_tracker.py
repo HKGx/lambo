@@ -1,15 +1,17 @@
 import asyncio
-from datetime import date, timedelta
 import json
+from datetime import date, timedelta
 from typing import Optional
 
 import discord
-from discord.ext.commands import Cog, Context, command, check
+from discord.ext.commands import Cog, Context, check, command
 from more_itertools import stagger
+from tortoise.expressions import F
+from tortoise.transactions import in_transaction
 
 from lambo import CustomClient
 from lambo.cogs.giveaway import GiveawayCog
-from lambo.cogs.strata import StrataCog
+from lambo.cogs.strata.strata_cog import StrataCog
 from lambo.models.activity_tracker_model import (
     ExportedStageDict,
     StageModel,
@@ -18,11 +20,6 @@ from lambo.models.activity_tracker_model import (
 )
 from lambo.models.strata_models import ActivityTrackerModel
 from lambo.utils import TimedeltaConverter, is_member
-
-from lambo.cogs.strata.StrataCog import StrataCog
-
-from tortoise.expressions import F
-from tortoise.transactions import in_transaction
 
 
 class ActivityTracker(StrataCog, name="Activity Tracker"):
@@ -59,7 +56,6 @@ class ActivityTracker(StrataCog, name="Activity Tracker"):
         today = date.today()
 
         async with in_transaction():
-
             model, created = await ActivityTrackerModel.get_or_create(
                 channel_id=message.channel.id,
                 date=today,
@@ -83,7 +79,6 @@ class ActivityTracker(StrataCog, name="Activity Tracker"):
     @check(StrataCog.mod_only)
     @command(name="list_stages")
     async def get_stages(self, ctx: Context) -> None:
-
         stages = await StageModel.all().limit(10)
         stage_text = []
         for stage in stages:
