@@ -10,7 +10,7 @@ from .items_list import setup as items_list_setup
 from .mention_channel import setup as mention_channel_setup
 from .ping_block import setup as ping_block_setup
 from .reminder import setup as reminder_setup
-
+from .charity_stream import setup as charity_stream_setup
 
 def apply_bot(bot: CustomClient):
     def inner(func: Callable[[CustomClient], None]) -> None:
@@ -28,5 +28,6 @@ def setup(bot: CustomClient):
         ping_block_setup,
         color_management_setup,
         reminder_setup,
+        charity_stream_setup
     ):
         func(bot)

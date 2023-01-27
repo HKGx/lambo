@@ -3,12 +3,15 @@ from discord.ext.commands import Cog, Context
 
 from lambo import CustomClient
 from lambo.utils import is_member
+from lambo.utils.utils import get_guild
 
 
 class StrataCog(Cog):
     bot: CustomClient
 
-    ALLOWED_GUILD_IDS = [211261411119202305, 950868480041824266]
+    STRATA_CZASU_ID = 211261411119202305
+    SUPPORT_SERVER_ID = 950868480041824266
+    ALLOWED_GUILD_IDS = [STRATA_CZASU_ID, SUPPORT_SERVER_ID]
     MODERATOR_ROLE_IDS = [303943612784181248, 950873817193000991]
     CARETAKER_ROLES = [
         *MODERATOR_ROLE_IDS,
@@ -16,6 +19,10 @@ class StrataCog(Cog):
         412193755286732800,
         303943612784181248,
     ]
+
+    @property
+    def strata_czasu(self) -> discord.Guild:
+        return get_guild(self.bot, self.STRATA_CZASU_ID)
 
     def __init__(self, bot: CustomClient) -> None:
         super().__init__()
