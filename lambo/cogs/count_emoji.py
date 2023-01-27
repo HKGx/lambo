@@ -40,10 +40,10 @@ def get_timestamp_tag(timestamp: datetime) -> str:
 
 
 class RankingFlags(FlagConverter):
-    reversed: bool = flag(name="reversed", aliases=["rev"], default=False)
+    reversed: bool = flag(aliases=["rev"], default=False)
     # animated_only: bool = flag(name="animated", aliases=["a"], default=False)
     # static_only: bool = flag(name="static", aliases=["s"], default=False)
-    page: int = flag(name="page", default=1)
+    page: int = 1
 
 
 class CountEmojiCog(Cog, name="Emoji Counting"):
