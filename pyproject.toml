@@ -14,7 +14,7 @@ lambo = 'lambo:main'
 python = "^3.10"
 pydantic = {extras = ["dotenv"], version = "^1.10.4"}
 tortoise-orm = "^0.19.2"
-py-cord = "^2.3.2"
+py-cord = "2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.11.4"
